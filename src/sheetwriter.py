@@ -1,14 +1,17 @@
 from typing import Tuple, List
 from PIL import Image, ImageDraw, ImageFont
+from sys import exit
 import os
 
 
 def convert_to_pdf():
     img = Image.open('0.png')
+    img.convert('RGB')
     imgs = []
     for file in os.listdir():
         if file[-3:] == 'png':
             f = Image.open(file)
+            f.convert('RGB')
             imgs.append(f)
             os.remove(file)
     img.save('./new.pdf', save_all=True, append_images=imgs[1:])
@@ -60,14 +63,19 @@ class SheetWriter:
         """
         Center and generate image page
         """
-        img2 = Image.open(img)
-        img2_w, img2_h = img2.size
-        img = Image.new('RGB', self.dimension, self.bg_color)
-        img_w, img_h = img.size
-        offset = ((img_w - img2_w) // 2, (img_h - img2_h) // 2)
-        img2.thumbnail(self.dimension)
-        img.paste(img2, offset)
-        img.save(name)
+        try:
+            img2 = Image.open(img)
+            img2_w, img2_h = img2.size
+            img = Image.new('RGB', self.dimension, self.bg_color)
+            img_w, img_h = img.size
+            offset = ((img_w - img2_w) // 2, (img_h - img2_h) // 2)
+            img2.resize(self.dimension)
+            img.paste(img2, offset)
+            img.save(name)
+        except FileNotFoundError: 
+            print(f"Error: {img} was not found.")
+            exit(1)
+
 
     def create_sheet(self):
         page_number = 0

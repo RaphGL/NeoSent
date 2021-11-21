@@ -1,9 +1,9 @@
 from sheetwriter import *
-from sys import argv
+from sys import argv, exit
 
 
 def main():
-    if len(argv) == 1 or argv[0] == 'help' or argv[0] == "-h" or argv[0] == '--help':
+    if len(argv) == 1:
         print("Usage: neosent FILE")
     try:
         file = parse_file(argv[1])
@@ -13,8 +13,7 @@ def main():
         print(f'No such file or directory: {argv[1]}')
         exit(1)
 
-    sheet = SheetWriter(file, (1280, 720), (0, 0, 0),
-                        '/usr/share/fonts/open-sans/OpenSans-Regular.ttf')
+    sheet = SheetWriter(file, (1280, 720), (0, 0, 0), './OpenSansEmoji.ttf')
     sheet.create_sheet()
     convert_to_pdf()
 
