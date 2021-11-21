@@ -1,7 +1,5 @@
-from os import pathconf
 from typing import Tuple, List
 from PIL import Image, ImageDraw, ImageFont
-from PIL import Image
 import os
 
 
@@ -80,7 +78,12 @@ class SheetWriter:
                     self._draw_image_page(f'{page_number}.png', line[1:])
                     page_number += 1
                     continue
+                if line == '\\':
+                    self._draw_text_page(f'{page_number}.png', '')
+                    page_number += 1
+                    continue
                 newp += '\n' + line
-            self._draw_text_page(f'{page_number}.png', newp)
-            newp = ''
-            page_number += 1
+            if newp != '':
+                self._draw_text_page(f'{page_number}.png', newp)
+                newp = ''
+                page_number += 1

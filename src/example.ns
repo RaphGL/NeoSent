@@ -6,12 +6,19 @@ Why?
 - No flashiness
 - Direct
 
+#this is a comment
 Also:
     Terminal presentations 
     don't support images
 
+\
+
+# a picture
 @nyan.jpg
-#this is a comment and won't be displayed
+
+@nyan.jpg
+
+\
 
 Easy to use
 
