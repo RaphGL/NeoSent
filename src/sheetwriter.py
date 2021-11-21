@@ -1,7 +1,9 @@
-from typing import Tuple, List
+from typing import Tuple, List, final
 from PIL import Image, ImageDraw, ImageFont
 from sys import exit, argv
-import os, tempfile, shutil
+import os
+import tempfile
+import shutil
 
 
 class SheetWriter:
@@ -76,7 +78,28 @@ class SheetWriter:
         img = Image.new('RGB', self.dimension, self.bg_color)
         page = ImageDraw.Draw(img)
         # centered text
-        page.text((self.dimension[0]/2, self.dimension[1]/2.2), text,
+
+        def wrap_text(text: str, width: int):
+            """
+            Limits text to a maximum character size per line
+            Except for long strings, which will be left as is
+            """
+            final_text = ''
+            count = 0
+            for c in text:
+                if count > width and c == ' ':
+                    final_text += c + '\n'
+                    count = 0
+                    continue
+                if c == '\n':
+                    count = 0
+                count += 1
+                final_text += c
+            print(final_text)
+            return final_text
+
+        text = wrap_text(text, 22)
+        page.text((self.dimension[0]/2, (self.dimension[1])/2.2), text,
                   font=self.font, anchor='mm', align='left', )
         img.save(name)
 
@@ -122,7 +145,7 @@ class SheetWriter:
                     page_number += 1
                     continue
                 newp += '\n' + line
-            
+
             # create slide on empty line occurrence
             if newp != '':
                 self._draw_text_page(
