@@ -95,7 +95,6 @@ class SheetWriter:
                     count = 0
                 count += 1
                 final_text += c
-            print(final_text)
             return final_text
 
         text = wrap_text(text, 22)
