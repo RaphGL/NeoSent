@@ -1,5 +1,5 @@
 import os
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -12,26 +12,27 @@ def read(fname):
 
 
 setup(
-    name="NeoSent",
-    version="0.1",
-    author="RaphGL",
-    author_email="raphfl.dev@gmail.com",
-    description=("Suckful Neosent"),
-    license="GPLv3",
-    entry_points={
-        "console_scripts": [
-            "neosent = src.main:main"
-        ]
-    },
-    keywords="sent suckless presentation sheet",
-    url="https://github.com/RaphGL/NeoSent",
+    name='NeoSent',
+    version='0.1',
+    url='https://github.com/RaphGL/NeoSent',
+    author='RaphGL',
+    author_email='raphfl_dev@gmail.com',
+    description='Suckful Sent',
     long_description=read('README.md'),
+    packages=find_namespace_packages(),
+    install_requires=['pillow'],
     classifiers=[
-        "Topic :: Utilities",
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
     ],
-
-    packages=find_packages(where="neosent"),
-    data_files=["neosent/OpenSansEmoji.ttf"],
+    entry_points={
+        'console_scripts': [
+            'neosent = neosent.main:main',
+        ],
+    },
     include_package_data=True,
-    install_requires=["Pillow"],
+    package_data={
+        '': ['data/*']
+        },
 )

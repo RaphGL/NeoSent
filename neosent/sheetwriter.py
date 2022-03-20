@@ -71,8 +71,7 @@ class SheetWriter:
         # images are listed in decreased order in /tmp
         imgs.reverse()
         # strip away file extension from presentation file
-        filename = argv[1][:-3] if argv[1][-2:] == 'ns' else argv[1]
-        img.save(f'{filename}.pdf', save_all=True, append_images=imgs[1:])
+        img.save(f'{argv[1]}.pdf', save_all=True, append_images=imgs[1:])
 
     def _draw_text_page(self, name: str, text: str):
         img = Image.new('RGB', self.dimension, self.bg_color)
@@ -157,12 +156,23 @@ class SheetWriter:
         shutil.copy(f'./{argv[1]}', self.work_dir)
         os.chdir(self.work_dir)
         self.convert_to_pdf()
+
         # get generated pdf file's name and move the final pdf to user's dir
-        pdf_file = f'{argv[1][:-3]}.pdf'
+        pdf_file = f'{argv[1]}.pdf'
+        final_pdf_file = f'{argv[1]}'.split('.')
+        if len(final_pdf_file) != 1:
+            final_pdf_file = ''.join(final_pdf_file[:-1])
+        else:
+            final_pdf_file = ''.join(final_pdf_file)
+        final_pdf_file = f'{final_pdf_file}.pdf'
+
+        # copies and removes instead of shutil.move 
+        # with shutil.move it would error out if folders are in different file systems
         try:
-            shutil.move(pdf_file, main_dir)
+            shutil.copy(f'{self.work_dir}/{pdf_file}', f'{main_dir}/{final_pdf_file}')
         except:
-            os.remove(f'{main_dir}/{pdf_file}')
-            shutil.move(pdf_file, main_dir)
+            os.remove(f'{main_dir}/{final_pdf_file}')
+            shutil.copy(f'{self.work_dir}/{pdf_file}', f'{main_dir}/{final_pdf_file}')
+        os.remove(f'{self.work_dir}/{pdf_file}')
         # cleanup tmp folder
         shutil.rmtree(self.work_dir)
