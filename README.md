@@ -2,13 +2,11 @@
 <br />
 <p align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="logo.png" alt="Logo" height="80">
   </a>
 
-  <h3 align="center">NeoSent</h3>
-
+  <h3 align="center">Suckful Sent</h3>
   <p align="center">
-     Suckful Sent. 
     <br />
     <a href="https://github.com/RaphGL/NeoSent"><strong>Explore the docs »</strong></a>
     <br />
@@ -44,7 +42,8 @@
 
 <!-- ABOUT THE PROJECT -->
 
-NeoSent is inspired by Suckless Sent. It aims to rewrite most of the features in Sent in python to reduce the pain of patching Sent and not having support for some things that should always be there. The twist is that sent actually converts a .ns (neosent file) onto a .pdf file so once you run it through neosent one won't need to have the program around.
+Neosent is a drop-in replacement for Suckless Sent. It reimplements all of the features but instead of depending on X to output presentations it outputs presentations directly to PDF with the goal of making them more portable.
+
 
 ### Built With
 
@@ -63,17 +62,41 @@ TODO
 
 ## Usage
 
+NeoSent files usually have a `.ns` extension, but any (or no) extension is allowed as well.
+
+To compile your pdf, simply do:
 ```sh
 $ neosent file.ns
 ```
 
-It's as easy as that!
+The syntax is very minimal, to learn it just see this example:
+
+```
+NeoSent
+
+@some_image.png
+
+It depends on:
+- Python
+- Pillow
+
+neosent [FILE] 
+one slide per paragraph
+# This is a comment and it won't appear in the presentation
+
+\ # A backslash alone will create an empty slide
+
+\@FILE.png # Image is escape so it will only display the text
+
+Having problemas? Make an issue!
+```
+
 
 <!-- LICENSE -->
 
 ## License
 
-Distributed under GPLv3 License. See `LICENSE` for more information.
+Distributed under GPLv3 License. See [`LICENSE`](https://github.com/RaphGL/NeoSent/blob/main/LICENSE) for more information.
 
 <!-- ACKNOWLEDGEMENTS -->
 
