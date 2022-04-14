@@ -13,14 +13,14 @@ def read(fname):
 
 setup(
     name='NeoSent',
-    version='0.1',
+    version='0.8',
     url='https://github.com/RaphGL/NeoSent',
     author='RaphGL',
     author_email='raphfl_dev@gmail.com',
     description='Suckful Sent',
     long_description=read('README.md'),
     packages=find_namespace_packages(),
-    install_requires=['pillow'],
+    install_requires=['pillow', 'click'],
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
@@ -28,7 +28,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'neosent = neosent.main:main',
+            'neosent = neosent.main:cli',
         ],
     },
     include_package_data=True,

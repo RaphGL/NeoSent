@@ -1,6 +1,5 @@
 from typing import Tuple, List, final
 from PIL import Image, ImageDraw, ImageFont
-from sys import exit, argv
 import os
 import tempfile
 import shutil
@@ -12,20 +11,20 @@ class SheetWriter:
     """
     work_dir = tempfile.mkdtemp('neosent')
 
-    def __init__(self, dimension: Tuple[int, int] = (1280, 720), bg_color: Tuple[float, ...] = (0, 0, 0), font: Tuple[str] = 'OpenSansEmoji.ttf'):
+    def __init__(self, dimension: Tuple[int, int], bg_color: Tuple[int, int, int], fg_color: Tuple[int, int, int],
+                font: str, font_size: int, filename: str):
         self.dimension = dimension
         self.bg_color = bg_color
-        self.font = ImageFont.truetype(font, size=60)
+        self.fg_color = fg_color
+        self.font = ImageFont.truetype(font, size=font_size)
+        self.filename = filename
 
-        if len(argv) == 1:
-            print("Usage: neosent FILE")
         try:
-            self.file = self.parse_file(argv[1])
+            self.file = self.parse_file(self.filename)
         except IndexError:
-            exit(1)
+            return 1
         except FileNotFoundError:
-            print(f'No such file or directory: {argv[1]}')
-            exit(2)
+            return 2
 
     @staticmethod
     def parse_file(file) -> List:
@@ -53,8 +52,7 @@ class SheetWriter:
 
         return list_of_pages
 
-    @staticmethod
-    def convert_to_pdf():
+    def convert_to_pdf(self):
         """
         Convert png files to a single pdf file
         """
@@ -71,7 +69,7 @@ class SheetWriter:
         # images are listed in decreased order in /tmp
         imgs.reverse()
         # strip away file extension from presentation file
-        img.save(f'{argv[1]}.pdf', save_all=True, append_images=imgs[1:])
+        img.save(f'{self.filename}.pdf', save_all=True, append_images=imgs[1:])
 
     def _draw_text_page(self, name: str, text: str):
         img = Image.new('RGB', self.dimension, self.bg_color)
@@ -98,7 +96,7 @@ class SheetWriter:
 
         text = wrap_text(text, 22)
         page.text((self.dimension[0]/2, (self.dimension[1])/2.2), text,
-                  font=self.font, anchor='mm', align='left', )
+                  font=self.font, fill=self.fg_color, anchor='mm', align='left', )
         img.save(name)
 
     def _draw_image_page(self, name: str, img):
@@ -121,7 +119,7 @@ class SheetWriter:
             img.save(name)
         except FileNotFoundError:
             print(f"Error: {img} was not found.")
-            exit(1)
+            return 2
 
     # class end point
     def create_sheet(self):
@@ -153,26 +151,28 @@ class SheetWriter:
         # get user pwd
         main_dir = os.getcwd()
         # move required files to tmp folder
-        shutil.copy(f'./{argv[1]}', self.work_dir)
+        shutil.copy(f'./{self.filename}', self.work_dir)
         os.chdir(self.work_dir)
         self.convert_to_pdf()
 
         # get generated pdf file's name and move the final pdf to user's dir
-        pdf_file = f'{argv[1]}.pdf'
-        final_pdf_file = f'{argv[1]}'.split('.')
+        pdf_file = f'{self.filename}.pdf'
+        final_pdf_file = f'{self.filename}'.split('.')
         if len(final_pdf_file) != 1:
             final_pdf_file = ''.join(final_pdf_file[:-1])
         else:
             final_pdf_file = ''.join(final_pdf_file)
         final_pdf_file = f'{final_pdf_file}.pdf'
 
-        # copies and removes instead of shutil.move 
+        # copies and removes instead of shutil.move
         # with shutil.move it would error out if folders are in different file systems
         try:
-            shutil.copy(f'{self.work_dir}/{pdf_file}', f'{main_dir}/{final_pdf_file}')
+            shutil.copy(f'{self.work_dir}/{pdf_file}',
+                        f'{main_dir}/{final_pdf_file}')
         except:
             os.remove(f'{main_dir}/{final_pdf_file}')
-            shutil.copy(f'{self.work_dir}/{pdf_file}', f'{main_dir}/{final_pdf_file}')
+            shutil.copy(f'{self.work_dir}/{pdf_file}',
+                        f'{main_dir}/{final_pdf_file}')
         os.remove(f'{self.work_dir}/{pdf_file}')
         # cleanup tmp folder
         shutil.rmtree(self.work_dir)
