@@ -44,7 +44,6 @@
 
 Neosent is a drop-in replacement for Suckless Sent. It reimplements all of the features but instead of depending on X to output presentations it outputs presentations directly to PDF with the goal of making them more portable.
 
-
 ### Built With
 
 - [Python](https://www.python.org/)
@@ -64,10 +63,26 @@ TODO
 
 NeoSent files usually have a `.ns` extension, but any (or no) extension is allowed as well.
 
-To compile your pdf, simply do:
+To get your PDF, run:
+
 ```sh
 $ neosent file.ns
 ```
+
+All defaults can be changed through the use of flags.
+Example:
+
+```sh
+$ neosent --set-res 1280 720                 \
+          --set-bg 40 42 54                  \
+          --set-fg 248 248 242               \
+          --set-font "~/.fonts/FreeSans.ttf" \
+          --set-font-size 24                 \
+          -o "Final Presentation.pdf"        \
+          final_presentation.ns
+```
+
+To learn more about the flags available, check `neosent --help`.
 
 The syntax is very minimal, to learn it just see this example:
 
@@ -80,7 +95,7 @@ It depends on:
 - Python
 - Pillow
 
-neosent [FILE] 
+neosent [FILE]
 one slide per paragraph
 # This is a comment and it won't appear in the presentation
 
@@ -90,7 +105,6 @@ one slide per paragraph
 
 Having problemas? Make an issue!
 ```
-
 
 <!-- LICENSE -->
 
