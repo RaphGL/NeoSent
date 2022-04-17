@@ -12,19 +12,26 @@ class SheetWriter:
     work_dir = tempfile.mkdtemp('neosent')
 
     def __init__(self, dimension: Tuple[int, int], bg_color: Tuple[int, int, int], fg_color: Tuple[int, int, int],
-                font: str, font_size: int, filename: str):
+                 font: str, font_size: int, filename: str, output_file: str, verbose_mode: bool):
         self.dimension = dimension
         self.bg_color = bg_color
         self.fg_color = fg_color
         self.font = ImageFont.truetype(font, size=font_size)
         self.filename = filename
+        self.output_file = output_file
+        self.verbose_mode = verbose_mode
 
         try:
+            self.verbose_msg('Parsing file...')
             self.file = self.parse_file(self.filename)
         except IndexError:
             return 1
         except FileNotFoundError:
             return 2
+
+    def verbose_msg(self, msg):
+        if self.verbose_mode:
+            print(msg)
 
     @staticmethod
     def parse_file(file) -> List:
@@ -72,6 +79,7 @@ class SheetWriter:
         img.save(f'{self.filename}.pdf', save_all=True, append_images=imgs[1:])
 
     def _draw_text_page(self, name: str, text: str):
+        self.verbose_msg(f"\ncreating slide for text:\n'{text}'")
         img = Image.new('RGB', self.dimension, self.bg_color)
         page = ImageDraw.Draw(img)
         # centered text
@@ -99,10 +107,11 @@ class SheetWriter:
                   font=self.font, fill=self.fg_color, anchor='mm', align='left', )
         img.save(name)
 
-    def _draw_image_page(self, name: str, img):
+    def _draw_image_page(self, name: str, img: str):
         """
         Center and generate image page
         """
+        self.verbose_msg(f'\ncreating slide for: {img}')
         try:
             # get images' height and width
             img2 = Image.open(img)
@@ -132,11 +141,13 @@ class SheetWriter:
                 filename = f'{self.work_dir}/{page_number}'
                 # draw image slide if line starts with @
                 if line[0] == '@':
+                    self.verbose_msg('creating image slide...')
                     self._draw_image_page(f'{filename}.png', line[1:])
                     page_number += 1
                     continue
                 # draw empty slide if line is \
                 if line == '\\':
+                    self.verbose_msg('creating empty slide...')
                     self._draw_text_page(f'{filename}.png', '')
                     page_number += 1
                     continue
@@ -148,6 +159,8 @@ class SheetWriter:
                     f'{self.work_dir}/{page_number}.png', newp)
                 newp = ''
                 page_number += 1
+
+        self.verbose_msg('\ngenerating pdf...')
         # get user pwd
         main_dir = os.getcwd()
         # move required files to tmp folder
@@ -157,15 +170,20 @@ class SheetWriter:
 
         # get generated pdf file's name and move the final pdf to user's dir
         pdf_file = f'{self.filename}.pdf'
-        final_pdf_file = f'{self.filename}'.split('.')
-        if len(final_pdf_file) != 1:
-            final_pdf_file = ''.join(final_pdf_file[:-1])
+        if self.output_file == '':
+            # make the filename the same as the original file
+            final_pdf_file = f'{self.filename}'.split('.')
+            if len(final_pdf_file) != 1:
+                final_pdf_file = ''.join(final_pdf_file[:-1])
+            else:
+                final_pdf_file = ''.join(final_pdf_file)
+            final_pdf_file = f'{final_pdf_file}.pdf'
         else:
-            final_pdf_file = ''.join(final_pdf_file)
-        final_pdf_file = f'{final_pdf_file}.pdf'
+            final_pdf_file = self.output_file
 
         # copies and removes instead of shutil.move
         # with shutil.move it would error out if folders are in different file systems
+        self.verbose_msg(f'moving pdf to {main_dir}/{final_pdf_file}')
         try:
             shutil.copy(f'{self.work_dir}/{pdf_file}',
                         f'{main_dir}/{final_pdf_file}')
@@ -176,3 +194,4 @@ class SheetWriter:
         os.remove(f'{self.work_dir}/{pdf_file}')
         # cleanup tmp folder
         shutil.rmtree(self.work_dir)
+        self.verbose_msg('done!')
