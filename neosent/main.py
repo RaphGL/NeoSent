@@ -13,7 +13,7 @@ import click
               metavar='<R G B>', help='set the foreground color')  # Idem
 @click.option('--set-font', 'font', default="data/OpenSansEmoji.ttf",
               metavar='<font_path>', help='the font used')
-@click.option('--set-font-size', 'font_size', default=240, show_default=True, type=int,
+@click.option('--set-font-size', 'font_size', default=210, show_default=True, type=int,
             metavar='<size>', help='set the font size')
 @click.option('-o', 'output_file', default='', metavar='<output_file>', help='the name of the output file')
 @click.option('-v', 'verbose', is_flag=True, help='get verbose output')

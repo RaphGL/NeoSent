@@ -84,6 +84,7 @@ class SheetWriter:
         page = ImageDraw.Draw(img)
         # centered text
 
+        spacing = round(self.dimension[1]/720)
         def wrap_text(text: str, width: int):
             """
             Limits text to a maximum character size per line
@@ -93,7 +94,7 @@ class SheetWriter:
             count = 0
             for c in text:
                 if count > width and c == ' ':
-                    final_text += c + '\n'
+                    final_text += c * spacing + '\n'
                     count = 0
                     continue
                 if c == '\n':
@@ -104,7 +105,7 @@ class SheetWriter:
 
         text = wrap_text(text, 22)
         page.text((self.dimension[0]/2, (self.dimension[1])/2.2), text,
-                  font=self.font, fill=self.fg_color, anchor='mm', align='left', )
+                  font=self.font, fill=self.fg_color, anchor='mm', align='left', spacing=spacing * 12)
         img.save(name)
 
     def _draw_image_page(self, name: str, img: str):
