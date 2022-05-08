@@ -36,7 +36,6 @@
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
 </details>
 
@@ -55,7 +54,15 @@ Neosent is a drop-in replacement for Suckless Sent. It reimplements all of the f
 
 ### Installation
 
-TODO
+1. Download the `.zip` file
+2. Extract it
+3. On the extracted folder run:
+
+```sh
+pip install --user .
+```
+
+5. Add `~/.local/lib/python3.10/site-packages/neosent` to your PATH.
 
 <!-- USAGE EXAMPLES -->
 
@@ -111,12 +118,6 @@ Having problemas? Make an issue!
 ## License
 
 Distributed under GPLv3 License. See [`LICENSE`](https://github.com/RaphGL/NeoSent/blob/main/LICENSE) for more information.
-
-<!-- ACKNOWLEDGEMENTS -->
-
-## Acknowledgements
-
-- [TODO]()
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
