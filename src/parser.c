@@ -193,13 +193,9 @@ void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec) {
       break;
     }
 
-    // TODO remove this
-
     if (item.content != NULL) {
       vec_push(token_vec, item);
       item.content = NULL;
-      // free(item.content);
-      // item.content = NULL;
     }
   }
 }
