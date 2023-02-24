@@ -22,15 +22,16 @@ typedef struct ns_parser {
   FILE *stylesheet;
 } ns_Parser;
 
+typedef struct vec_vector vec_Vector;
 
 ns_Parser ns_parser_new(char *filename);
-void ns_parser_free(ns_Parser *parser);
+void ns_parser_free(ns_Parser *parser, vec_Vector *token_vec);
 char ns_parser_peek(ns_Parser *parser);
 char ns_parser_next(ns_Parser *parser);
 void ns_parser_parse_comment(ns_Parser *parser);
 void ns_parser_parse_image(ns_Parser *parser, ns_Item *item);
 void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item);
 void ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item);
-void ns_parser_parse(ns_Parser *parser);
+void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec);
 
 #endif

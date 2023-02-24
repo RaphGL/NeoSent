@@ -1,6 +1,6 @@
 #include "parser.h"
+#include "vector.h"
 #include <ctype.h>
-#include <errno.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +21,7 @@ ns_Parser ns_parser_new(char *filename) {
   };
 }
 
-void ns_parser_free(ns_Parser *parser) {
+void ns_parser_free(ns_Parser *parser, vec_Vector *token_vec) {
   fclose(parser->stylesheet);
   *parser = (ns_Parser){
       .stylesheet = NULL,
@@ -29,6 +29,13 @@ void ns_parser_free(ns_Parser *parser) {
       .linenum = 1,
       .curr = '\0',
   };
+
+  for (size_t i = 0; i < vec_len(token_vec); i++) {
+    ns_Item item = vec_get(token_vec, i);
+    free(item.content);
+  }
+
+  vec_free(token_vec);
 }
 
 char ns_parser_peek(ns_Parser *parser) {
@@ -150,7 +157,7 @@ void ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item) {
   }
 }
 
-void ns_parser_parse(ns_Parser *parser) {
+void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec) {
   ns_Item item = (ns_Item){
       .content = NULL,
   };
@@ -187,28 +194,12 @@ void ns_parser_parse(ns_Parser *parser) {
     }
 
     // TODO remove this
-    {
 
-      if (item.content != NULL) {
-        switch (item.type) {
-        case NS_EMPTYSLIDE:
-          puts("EMPTYSLIDE");
-          break;
-
-        case NS_IMAGE:
-          puts("IMAGE");
-          break;
-
-        case NS_PARAGRAPH:
-          puts("PARAGRAPH");
-          break;
-        }
-
-        printf("%d:%d %s\n\n", item.linenum, item.colnum, item.content);
-
-        free(item.content);
-        item.content = NULL;
-      }
+    if (item.content != NULL) {
+      vec_push(token_vec, item);
+      item.content = NULL;
+      // free(item.content);
+      // item.content = NULL;
     }
   }
 }
