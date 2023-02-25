@@ -43,11 +43,18 @@ ns_Renderer ns_renderer_create(char *title) {
     exit(1);
   }
 
+  TTF_Font *font = TTF_OpenFont("NotoSans-Regular.ttf", 16);
+  if (!font) {
+    fputs("Error: Could not load font.", stderr);
+    exit(1);
+  }
+
   return (ns_Renderer){
       .window = window,
       .renderer = renderer,
       .fg = {0xFF, 0xFF, 0xFF, 0xFF},
       .bg = {0, 0, 0, 0xFF},
+      .font = font,
   };
 }
 
@@ -56,6 +63,7 @@ void ns_renderer_destroy(ns_Renderer *restrict renderer) {
   SDL_DestroyWindow(renderer->window);
   IMG_Quit();
   SDL_Quit();
+  TTF_CloseFont(renderer->font);
   TTF_Quit();
 }
 
@@ -105,16 +113,13 @@ void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
   const int text_len = ns_get_longest_line(item->content);
   SDL_Point win_size;
   SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+  TTF_SetFontSize(renderer->font, win_size.x / text_len);
 
   printf("%d\n", win_size.x / text_len);
-  TTF_Font *font = TTF_OpenFont("NotoSans-Regular.ttf", win_size.x / text_len);
-  if (!font) {
-    fputs("Error: Could not load font.", stderr);
-    exit(1);
-  }
 
-  SDL_Surface *text_surface = TTF_RenderText_LCD_Wrapped(
-      font, item->content, renderer->fg, renderer->bg, 0);
+  TTF_SetFontHinting(renderer->font, TTF_HINTING_LIGHT_SUBPIXEL);
+  SDL_Surface *text_surface = TTF_RenderUTF8_Blended_Wrapped(
+      renderer->font, item->content, renderer->fg, 0);
   SDL_Texture *text_texture =
       SDL_CreateTextureFromSurface(renderer->renderer, text_surface);
 
@@ -126,7 +131,6 @@ void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
   SDL_RenderCopy(renderer->renderer, text_texture, NULL, &text_rect);
   SDL_DestroyTexture(text_texture);
   SDL_FreeSurface(text_surface);
-  TTF_CloseFont(font);
 }
 
 void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,

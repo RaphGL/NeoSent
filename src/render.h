@@ -10,6 +10,7 @@ typedef struct {
   SDL_Window *window;
   SDL_Color fg;
   SDL_Color bg;
+  TTF_Font *font;
 } ns_Renderer;
 
 ns_Renderer ns_renderer_create(char *title);
