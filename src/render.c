@@ -115,8 +115,6 @@ void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
   SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
   TTF_SetFontSize(renderer->font, win_size.x / text_len);
 
-  printf("%d\n", win_size.x / text_len);
-
   TTF_SetFontHinting(renderer->font, TTF_HINTING_LIGHT_SUBPIXEL);
   SDL_Surface *text_surface = TTF_RenderUTF8_Blended_Wrapped(
       renderer->font, item->content, renderer->fg, 0);

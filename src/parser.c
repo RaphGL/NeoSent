@@ -86,16 +86,22 @@ void ns_parser_parse_image(ns_Parser *parser, ns_Item *item) {
     if (isspace(c)) {
       image.content[i] = '\0';
       *item = image;
-      return;
+      break;
     }
 
     image.content[i] = c;
     i++;
   }
+
+  while ((c = ns_parser_next(parser)) != EOF) {
+    if (c == '\n' && ns_parser_peek(parser) == '\n') {
+      return;
+    }
+  }
 }
 
 void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
-  if (!isalnum(parser->curr)) {
+  if (isspace(parser->curr)) {
     return;
   }
 
@@ -112,6 +118,15 @@ void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
 
   paragraph.content[0] = parser->curr;
   while ((c = ns_parser_next(parser)) != EOF) {
+    // skip escaped chars
+    switch (ns_parser_peek(parser)) {
+    case '#':
+    case '\\':
+    case '@':
+      ns_parser_next(parser);
+      break;
+    }
+
     if (c == '\n' && ns_parser_peek(parser) == '\n') {
       paragraph.content[i] = '\0';
       *item = paragraph;
@@ -151,9 +166,16 @@ void ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item) {
       empty_slide.content[0] = '\\';
       empty_slide.content[1] = '\0';
       *item = empty_slide;
-      ns_parser_next(parser);
+      break;
+    }
+  }
+
+  while (c != EOF) {
+    if (c == '\n' && ns_parser_peek(parser) == '\n') {
       return;
     }
+
+    ns_parser_next(parser);
   }
 }
 
@@ -163,17 +185,6 @@ void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec) {
   };
 
   while ((parser->curr = ns_parser_next(parser)) != EOF) {
-    if (parser->curr == '\\') {
-      int peeked = ns_parser_peek(parser);
-      switch (peeked) {
-      case '#':
-      case '\\':
-      case '@':
-        ns_parser_next(parser);
-        break;
-      }
-    }
-
     switch (parser->curr) {
     case '#':
       ns_parser_parse_comment(parser);
@@ -181,7 +192,18 @@ void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec) {
       break;
 
     case '\\':
-      ns_parser_parse_emptyslide(parser, &item);
+      switch (ns_parser_peek(parser)) {
+      case '#':
+      case '\\':
+      case '@':
+        ns_parser_next(parser);
+        ns_parser_parse_paragraph(parser, &item);
+        break;
+
+      default:
+        ns_parser_parse_emptyslide(parser, &item);
+        break;
+      }
       break;
 
     case '@':
