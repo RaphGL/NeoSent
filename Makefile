@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Wpedantic -g 
-LDFLAGS = -lm -lSDL2
+CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -g $(shell sdl2-config --cflags)
+LDFLAGS = -lm $(shell sdl2-config --libs) -lSDL2_image -lSDL2_ttf
 # debug flags
 DBFLAGS := -g -fsanitize=address -fsanitize=undefined
 SRC = $(wildcard src/*.c) 
