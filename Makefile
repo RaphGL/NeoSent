@@ -9,13 +9,13 @@ OBJ = $(patsubst src/%.c, %.o, $(SRC))
 .PHONY: all debug clean
 
 all: $(OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) -O2 $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -O2 $^ -o nsent
 
 debug: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DBFLAGS) $^
 
 clean:
-	rm -f *.o a.out
+	rm -f *.o a.out nsent
 
 $(OBJ): $(SRC)
 	$(CC) $(CFLAGS) $(LDFLAGS) -c $?
