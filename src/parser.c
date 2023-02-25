@@ -127,7 +127,7 @@ void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
       break;
     }
 
-    if (c == '\n' && ns_parser_peek(parser) == '\n') {
+    if (c == '\n' && (ns_parser_peek(parser) == '\n' || ns_parser_peek(parser) == EOF)) {
       paragraph.content[i] = '\0';
       *item = paragraph;
       return;
