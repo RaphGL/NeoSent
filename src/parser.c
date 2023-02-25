@@ -57,8 +57,8 @@ char ns_parser_next(ns_Parser *parser) {
   return parser->curr;
 }
 
-// skips comments if they start on column 1
 void ns_parser_parse_comment(ns_Parser *parser) {
+  // skips comments if they don't start at column 1
   if (parser->colnum != 1) {
     return;
   }

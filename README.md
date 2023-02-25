@@ -41,16 +41,31 @@
 
 <!-- ABOUT THE PROJECT -->
 
-Neosent is a drop-in replacement for Suckless Sent. It reimplements all of the features but instead of depending on X to output presentations it outputs presentations directly to PDF with the goal of making them more portable.
+Neosent is a drop-in replacement for Suckless Sent.
+
+It provide everything you need out of the box instead of relying on patches and editing header files.
+
+Supports:
+
+- PNG, JPG, AVIF    ✅
+- TTF and OTF fonts ✅
 
 ### Built With
 
-- [Python](https://www.python.org/)
-- [Pillow](https://pillow.readthedocs.io/en/stable/)
+- C
+- [SDL2](https://www.libsdl.org/)
 
 <!-- GETTING STARTED -->
 
 ## Getting Started
+
+Make sure you the SDL2, SDL2_ttf and SDL2_image libraries installed.
+
+On Arch:
+
+```sh
+sudo pacman -S sdl2 sdl2_image sdl2_ttf
+```
 
 ### Installation
 
@@ -59,10 +74,10 @@ Neosent is a drop-in replacement for Suckless Sent. It reimplements all of the f
 3. On the extracted folder run:
 
 ```sh
-pip install --user .
+make
 ```
 
-5. Add `~/.local/lib/python3.10/site-packages/neosent` to your PATH.
+5. Move the `nsent` file to your `$PATH`.
 
 <!-- USAGE EXAMPLES -->
 
@@ -70,26 +85,9 @@ pip install --user .
 
 NeoSent files usually have a `.ns` extension, but any (or no) extension is allowed as well.
 
-To get your PDF, run:
-
 ```sh
-$ neosent file.ns
+$ nsent file.ns
 ```
-
-All defaults can be changed through the use of flags.
-Example:
-
-```sh
-$ neosent --set-res 1280 720                 \
-          --set-bg 40 42 54                  \
-          --set-fg 248 248 242               \
-          --set-font "~/.fonts/FreeSans.ttf" \
-          --set-font-size 24                 \
-          -o "Final Presentation.pdf"        \
-          final_presentation.ns
-```
-
-To learn more about the flags available, check `neosent --help`.
 
 The syntax is very minimal, to learn it just see this example:
 
@@ -99,8 +97,7 @@ NeoSent
 @some_image.png
 
 It depends on:
-- Python
-- Pillow
+- SDL2
 
 neosent [FILE]
 one slide per paragraph
@@ -110,7 +107,7 @@ one slide per paragraph
 
 \@FILE.png # Image is escape so it will only display the text
 
-Having problemas? Make an issue!
+Having problems? Make an issue!
 ```
 
 <!-- LICENSE -->
@@ -118,20 +115,3 @@ Having problemas? Make an issue!
 ## License
 
 Distributed under GPLv3 License. See [`LICENSE`](https://github.com/RaphGL/NeoSent/blob/main/LICENSE) for more information.
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
-[contributors-url]: https://github.com/othneildrew/Best-README-Template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
-[forks-url]: https://github.com/othneildrew/Best-README-Template/network/members
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=for-the-badge
-[stars-url]: https://github.com/othneildrew/Best-README-Template/stargazers
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
-[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/othneildrew
-[product-screenshot]: images/screenshot.png

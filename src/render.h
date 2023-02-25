@@ -13,8 +13,13 @@ typedef struct {
   TTF_Font *font;
 } ns_Renderer;
 
+// Sets up and initializes a renderer and its window
 ns_Renderer ns_renderer_create(char *title);
+
+// Deallocates all resources used by the renderer
 void ns_renderer_destroy(ns_Renderer *restrict renderer);
+
+// Interprets the tokens and draws the given page onto the screen
 void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,
                       const size_t page);
 
