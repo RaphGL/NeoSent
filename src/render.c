@@ -51,7 +51,7 @@ ns_Renderer ns_renderer_create(char *title) {
   };
 }
 
-void ns_renderer_destroy(ns_Renderer *renderer) {
+void ns_renderer_destroy(ns_Renderer *restrict renderer) {
   SDL_DestroyRenderer(renderer->renderer);
   SDL_DestroyWindow(renderer->window);
   IMG_Quit();
@@ -59,7 +59,7 @@ void ns_renderer_destroy(ns_Renderer *renderer) {
   TTF_Quit();
 }
 
-void ns_renderer_draw_img(ns_Renderer *renderer, ns_Item *item) {
+void ns_renderer_draw_img(const ns_Renderer *renderer, const ns_Item *item) {
   SDL_Surface *image_surface = IMG_Load(item->content);
   SDL_Texture *image_texture =
       SDL_CreateTextureFromSurface(renderer->renderer, image_surface);
@@ -83,26 +83,45 @@ void ns_renderer_draw_img(ns_Renderer *renderer, ns_Item *item) {
   SDL_FreeSurface(image_surface);
 }
 
-void ns_renderer_draw_paragraph(ns_Renderer *renderer, ns_Item *item) {
-  TTF_Font *font = TTF_OpenFont("NotoSans-Regular.ttf", 30);
+int ns_get_longest_line(const char *text) {
+  int text_len = 0;
+  int biggest_len = 0;
+  for (int i = 0; text[i] != '\0'; i++) {
+    text_len++;
+    if (text[i] == '\n') {
+      text_len = 0;
+    }
+
+    if (text_len > biggest_len) {
+      biggest_len = text_len;
+    }
+  }
+
+  return biggest_len;
+}
+
+void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
+                                const ns_Item *item) {
+  const int text_len = ns_get_longest_line(item->content);
+  SDL_Point win_size;
+  SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+
+  printf("%d\n", win_size.x / text_len);
+  TTF_Font *font = TTF_OpenFont("NotoSans-Regular.ttf", win_size.x / text_len);
   if (!font) {
     fputs("Error: Could not load font.", stderr);
     exit(1);
   }
 
-  SDL_Point win_size;
-  SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
-
   SDL_Surface *text_surface = TTF_RenderText_LCD_Wrapped(
-      font, item->content, renderer->fg, renderer->bg, win_size.x);
+      font, item->content, renderer->fg, renderer->bg, 0);
   SDL_Texture *text_texture =
       SDL_CreateTextureFromSurface(renderer->renderer, text_surface);
 
-  SDL_Rect text_rect = (SDL_Rect){
-      .x = 0,
-      .y = 0,
-  };
+  SDL_Rect text_rect;
   SDL_QueryTexture(text_texture, NULL, NULL, &text_rect.w, &text_rect.h);
+  text_rect.x = win_size.x / 2 - text_rect.w / 2;
+  text_rect.y = win_size.y / 2 - text_rect.h / 2;
 
   SDL_RenderCopy(renderer->renderer, text_texture, NULL, &text_rect);
   SDL_DestroyTexture(text_texture);
@@ -110,7 +129,7 @@ void ns_renderer_draw_paragraph(ns_Renderer *renderer, ns_Item *item) {
   TTF_CloseFont(font);
 }
 
-void ns_renderer_draw(ns_Renderer *renderer, vec_Vector *token_vec,
+void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,
                       const size_t page) {
   ns_Item item = vec_get(token_vec, page);
   SDL_SetRenderDrawColor(renderer->renderer, renderer->bg.r, renderer->bg.g,

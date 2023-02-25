@@ -13,8 +13,8 @@ typedef struct {
 } ns_Renderer;
 
 ns_Renderer ns_renderer_create(char *title);
-void ns_renderer_destroy(ns_Renderer *renderer);
-void ns_renderer_draw(ns_Renderer *renderer, vec_Vector *token_vec,
-                      size_t page);
+void ns_renderer_destroy(ns_Renderer *restrict renderer);
+void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,
+                      const size_t page);
 
 #endif
