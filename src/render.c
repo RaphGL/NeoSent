@@ -5,7 +5,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_video.h>
 #include <stdio.h>
+#include <string.h>
 
 ns_Renderer ns_renderer_create(char *title) {
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -42,7 +44,6 @@ ns_Renderer ns_renderer_create(char *title) {
   }
 
   return (ns_Renderer){
-      .curr_page = 1,
       .window = window,
       .renderer = renderer,
       .fg = {0xFF, 0xFF, 0xFF, 0xFF},
@@ -56,10 +57,31 @@ void ns_renderer_destroy(ns_Renderer *renderer) {
   IMG_Quit();
   SDL_Quit();
   TTF_Quit();
-  renderer->curr_page = 1;
 }
 
-void ns_renderer_draw_img(ns_Renderer *renderer, ns_Item *item) {}
+void ns_renderer_draw_img(ns_Renderer *renderer, ns_Item *item) {
+  SDL_Surface *image_surface = IMG_Load(item->content);
+  SDL_Texture *image_texture =
+      SDL_CreateTextureFromSurface(renderer->renderer, image_surface);
+
+  SDL_Rect image_rect = (SDL_Rect){
+      .x = 0,
+      .y = 0,
+  };
+
+  SDL_QueryTexture(image_texture, NULL, NULL, &image_rect.w, &image_rect.h);
+  SDL_Point win_size;
+  SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+  if (image_rect.w > win_size.x || image_rect.h > win_size.y) {
+    // TODO make image maintain ration when scaled down to fit
+    image_rect.w = win_size.x;
+    image_rect.h = win_size.y;
+  }
+
+  SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
+  SDL_DestroyTexture(image_texture);
+  SDL_FreeSurface(image_surface);
+}
 
 void ns_renderer_draw_paragraph(ns_Renderer *renderer, ns_Item *item) {
   TTF_Font *font = TTF_OpenFont("NotoSans-Regular.ttf", 30);
@@ -76,20 +98,17 @@ void ns_renderer_draw_paragraph(ns_Renderer *renderer, ns_Item *item) {
   SDL_Texture *text_texture =
       SDL_CreateTextureFromSurface(renderer->renderer, text_surface);
 
-  SDL_Point text_size;
-  SDL_QueryTexture(text_texture, NULL, NULL, &text_size.x, &text_size.y);
   SDL_Rect text_rect = (SDL_Rect){
       .x = 0,
       .y = 0,
-      .w = text_size.x,
-      .h = text_size.y,
   };
+  SDL_QueryTexture(text_texture, NULL, NULL, &text_rect.w, &text_rect.h);
 
   SDL_RenderCopy(renderer->renderer, text_texture, NULL, &text_rect);
+  SDL_DestroyTexture(text_texture);
+  SDL_FreeSurface(text_surface);
   TTF_CloseFont(font);
 }
-
-void ns_renderer_draw_emptyslide(ns_Renderer *renderer, ns_Item *item) {}
 
 void ns_renderer_draw(ns_Renderer *renderer, vec_Vector *token_vec,
                       const size_t page) {
@@ -105,7 +124,7 @@ void ns_renderer_draw(ns_Renderer *renderer, vec_Vector *token_vec,
     ns_renderer_draw_paragraph(renderer, &item);
     break;
   case NS_EMPTYSLIDE:
-    ns_renderer_draw_emptyslide(renderer, &item);
+    // doing nothing will make the slide empty
     break;
   }
 
