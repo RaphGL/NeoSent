@@ -83,6 +83,7 @@ void ns_parser_parse_image(ns_Parser *parser, ns_Item *item) {
   size_t i = 1;
   image.content[0] = parser->curr;
   while ((c = ns_parser_next(parser)) != EOF) {
+    // included images can't have spaces in their names
     if (isspace(c)) {
       image.content[i] = '\0';
       *item = image;

@@ -20,32 +20,35 @@ int main(int argc, char *argv[]) {
   SDL_Event e;
   size_t page = 0;
   for (;;) {
-    ns_renderer_draw(&renderer, token_vec, page);
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) {
         goto cleanup;
       }
 
-      switch (e.key.keysym.sym) {
-      case SDLK_RIGHT:
-      case 'l':
-        if (page + 1 < vec_len(token_vec))
-          page++;
-        break;
+      if (e.key.type == SDL_KEYDOWN && e.key.repeat == 0) {
+        switch (e.key.keysym.sym) {
+        case SDLK_RIGHT:
+        case 'l':
+          if (page + 1 < vec_len(token_vec)) {
+            ++page;
+          }
+          break;
 
-      case SDLK_LEFT:
-      case 'h':
-        if (page == 0) {
-          continue;
+        case SDLK_LEFT:
+        case 'h':
+          if (page != 0) {
+            --page;
+          }
+          break;
+
+        case 'q':
+          goto cleanup;
+          break;
         }
-        page--;
-        break;
-
-      case 'q':
-        goto cleanup;
-        break;
       }
     }
+
+    ns_renderer_draw(&renderer, token_vec, page);
   }
 
   // Final cleanup

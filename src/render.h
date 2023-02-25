@@ -1,5 +1,6 @@
 #ifndef RENDER_H
 #define RENDER_H
+#include <SDL2/SDL_ttf.h>
 #include <stddef.h>
 #include <SDL2/SDL.h>
 #include "vector.h"
