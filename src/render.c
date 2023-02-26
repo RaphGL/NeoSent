@@ -82,7 +82,6 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
         .a = 0xFF,
     };
   }
-    printf("bg_color: %x%x%x\nfg_color: %x%x%x\n", bg_color.r, bg_color.g, bg_color.b, fg_color.r, fg_color.g, fg_color.b);
 
   return (ns_Renderer){
       .window = window,

@@ -8,13 +8,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void ns_show_help_message(void) {
+  puts("Simple plaintext presentation tool"
+       "\n\n"
+       "Usage: nsent [OPTION...] <FILE>"
+       "\n\n"
+       " -t\tChange the text color\n"
+       " -b\tChange the background color\n"
+       " -f\tChange the font family\n"
+       " -h\tShow this message");
+}
+
 int main(int argc, char *argv[]) {
   // --- Parsing command line arguments ---
   int opt;
   uint32_t text_color = 0xFFFFFFFF;
   uint32_t bg_color = 0;
   char *font = "NotoSans-Regular.ttf";
-  while ((opt = getopt(argc, argv, ":t:b:f:")) != -1) {
+  while ((opt = getopt(argc, argv, ":ht:b:f:")) != -1) {
     switch (opt) {
     case 't':
       text_color = ns_get_color(optarg);
@@ -36,6 +47,11 @@ int main(int argc, char *argv[]) {
     case '?':
       fputs("Error: No such option.\n", stderr);
       return 1;
+      break;
+
+    case 'h':
+      ns_show_help_message();
+      return 0;
       break;
     }
   }
