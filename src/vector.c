@@ -1,10 +1,10 @@
+#include "vector.h"
 #include "parser.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "vector.h"
 
 typedef struct vec_vector {
   size_t len;
@@ -22,7 +22,7 @@ vec_Vector *vec_new(void) {
 }
 
 // Resizes vector to fit length
-bool vec_fit(vec_Vector *vec) {
+static bool vec_fit(vec_Vector *vec) {
   const size_t power = ceilf(log2f(vec->len + 1));
   const size_t new_capacity = sizeof(ns_Item) * powf(2, power);
   if (new_capacity < vec->capacity || new_capacity > vec->capacity) {

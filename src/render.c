@@ -102,20 +102,21 @@ void ns_renderer_destroy(ns_Renderer *restrict renderer) {
   TTF_Quit();
 }
 
-void ns_renderer_toggle_fullscreen(ns_Renderer *renderer)
-{
-    if (renderer->is_fullscreen) {
-        if (SDL_SetWindowFullscreen(renderer->window, 0) == 0) {
-            renderer->is_fullscreen = false;
-        }
-    } else {
-        if (SDL_SetWindowFullscreen(renderer->window, SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) {
-            renderer->is_fullscreen = true;
-        }
+void ns_renderer_toggle_fullscreen(ns_Renderer *renderer) {
+  if (renderer->is_fullscreen) {
+    if (SDL_SetWindowFullscreen(renderer->window, 0) == 0) {
+      renderer->is_fullscreen = false;
     }
+  } else {
+    if (SDL_SetWindowFullscreen(renderer->window,
+                                SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) {
+      renderer->is_fullscreen = true;
+    }
+  }
 }
 
-void ns_renderer_draw_img(const ns_Renderer *renderer, const ns_Item *item) {
+static void ns_renderer_draw_img(const ns_Renderer *renderer,
+                                 const ns_Item *item) {
   SDL_Surface *image_surface = IMG_Load(item->content);
   if (!image_surface) {
     fprintf(stderr, "Error: Could not read image %s defined at %d:%d\n",
@@ -145,8 +146,8 @@ void ns_renderer_draw_img(const ns_Renderer *renderer, const ns_Item *item) {
   SDL_FreeSurface(image_surface);
 }
 
-void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
-                                const ns_Item *item) {
+static void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
+                                       const ns_Item *item) {
   const int text_len = ns_get_longest_line(item->content);
   SDL_Point win_size;
   SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);

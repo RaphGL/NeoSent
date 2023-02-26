@@ -1,8 +1,8 @@
 #ifndef VECTOR_H
 #define VECTOR_H
+#include "parser.h"
 #include <stdbool.h>
 #include <stddef.h>
-#include "parser.h"
 
 typedef struct vec_vector vec_Vector;
 

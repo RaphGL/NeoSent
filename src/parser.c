@@ -38,13 +38,13 @@ void ns_parser_free(ns_Parser *parser, vec_Vector *token_vec) {
   vec_free(token_vec);
 }
 
-char ns_parser_peek(ns_Parser *parser) {
+static char ns_parser_peek(ns_Parser *parser) {
   int c = fgetc(parser->stylesheet);
   ungetc(c, parser->stylesheet);
   return c;
 }
 
-char ns_parser_next(ns_Parser *parser) {
+static char ns_parser_next(ns_Parser *parser) {
   parser->curr = fgetc(parser->stylesheet);
 
   if (parser->curr == '\n') {
@@ -57,7 +57,7 @@ char ns_parser_next(ns_Parser *parser) {
   return parser->curr;
 }
 
-void ns_parser_parse_comment(ns_Parser *parser) {
+static void ns_parser_parse_comment(ns_Parser *parser) {
   // skips comments if they don't start at column 1
   if (parser->colnum != 1) {
     return;
@@ -71,7 +71,7 @@ void ns_parser_parse_comment(ns_Parser *parser) {
   }
 }
 
-void ns_parser_parse_image(ns_Parser *parser, ns_Item *item) {
+static void ns_parser_parse_image(ns_Parser *parser, ns_Item *item) {
   ns_Item image = (ns_Item){
       .colnum = parser->colnum,
       .linenum = parser->linenum,
@@ -100,7 +100,7 @@ void ns_parser_parse_image(ns_Parser *parser, ns_Item *item) {
   }
 }
 
-void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
+static void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
   if (isspace(parser->curr)) {
     return;
   }
@@ -127,7 +127,8 @@ void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
       break;
     }
 
-    if (c == '\n' && (ns_parser_peek(parser) == '\n' || ns_parser_peek(parser) == EOF)) {
+    if (c == '\n' &&
+        (ns_parser_peek(parser) == '\n' || ns_parser_peek(parser) == EOF)) {
       paragraph.content[i] = '\0';
       *item = paragraph;
       return;
@@ -148,7 +149,7 @@ void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
   }
 }
 
-void ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item) {
+static void ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item) {
   if (parser->colnum != 1) {
     return;
   }

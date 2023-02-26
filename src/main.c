@@ -21,11 +21,14 @@ void ns_show_help_message(void) {
 }
 
 int main(int argc, char *argv[]) {
-  // --- Parsing command line arguments ---
   int opt;
+
+  // default values
   uint32_t text_color = 0xFFFFFFFF;
   uint32_t bg_color = 0;
   char *font = "NotoSans-Regular.ttf";
+
+  // --- Parsing command line arguments ---
   while ((opt = getopt(argc, argv, ":ht:b:f:")) != -1) {
     switch (opt) {
     case 't':
@@ -100,6 +103,10 @@ int main(int argc, char *argv[]) {
           if (page != 0) {
             --page;
           }
+          break;
+
+          // TODO show keymaps
+        case SDLK_F1:
           break;
 
           // toggle fullscreen

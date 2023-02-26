@@ -3,8 +3,8 @@
 #include "vector.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct {
   SDL_Renderer *renderer;
