@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_video.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,7 +30,6 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
   }
 
   SDL_Window *window =
-      // TODO make window fullscreen
       SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                        1536, 864, SDL_WINDOW_SHOWN);
   if (!window) {
@@ -89,6 +89,7 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
       .fg = fg_color,
       .bg = bg_color,
       .font = font,
+      .is_fullscreen = false,
   };
 }
 
@@ -99,6 +100,19 @@ void ns_renderer_destroy(ns_Renderer *restrict renderer) {
   SDL_Quit();
   TTF_CloseFont(renderer->font);
   TTF_Quit();
+}
+
+void ns_renderer_toggle_fullscreen(ns_Renderer *renderer)
+{
+    if (renderer->is_fullscreen) {
+        if (SDL_SetWindowFullscreen(renderer->window, 0) == 0) {
+            renderer->is_fullscreen = false;
+        }
+    } else {
+        if (SDL_SetWindowFullscreen(renderer->window, SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) {
+            renderer->is_fullscreen = true;
+        }
+    }
 }
 
 void ns_renderer_draw_img(const ns_Renderer *renderer, const ns_Item *item) {

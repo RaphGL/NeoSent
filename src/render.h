@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct {
   SDL_Renderer *renderer;
@@ -11,6 +12,7 @@ typedef struct {
   SDL_Color fg;
   SDL_Color bg;
   TTF_Font *font;
+  bool is_fullscreen;
 } ns_Renderer;
 
 // Sets up and initializes a renderer and its window
@@ -23,5 +25,8 @@ void ns_renderer_destroy(ns_Renderer *restrict renderer);
 // Interprets the tokens and draws the given page onto the screen
 void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,
                       const size_t page);
+
+// Toggle between fullscreen and windowed mode
+void ns_renderer_toggle_fullscreen(ns_Renderer *renderer);
 
 #endif

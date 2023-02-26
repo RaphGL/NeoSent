@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "vector.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 #include <getopt.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -74,6 +75,7 @@ int main(int argc, char *argv[]) {
         goto cleanup;
       }
 
+      // --- Neosent keybindings ---
       if (e.key.type == SDL_KEYDOWN && e.key.repeat == 0) {
         switch (e.key.keysym.sym) {
         case SDLK_RIGHT:
@@ -88,6 +90,11 @@ int main(int argc, char *argv[]) {
           if (page != 0) {
             --page;
           }
+          break;
+
+        case SDLK_F11:
+        case 'f':
+          ns_renderer_toggle_fullscreen(&renderer);
           break;
 
         case 'q':
