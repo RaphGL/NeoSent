@@ -1,15 +1,16 @@
 #include "render.h"
 #include "parser.h"
+#include "utils.h"
 #include "vector.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_video.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
-ns_Renderer ns_renderer_create(char *title) {
+ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
+                               uint32_t bg) {
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     fputs(SDL_GetError(), stderr);
     exit(1);
@@ -43,17 +44,51 @@ ns_Renderer ns_renderer_create(char *title) {
     exit(1);
   }
 
-  TTF_Font *font = TTF_OpenFont("NotoSans-Regular.ttf", 16);
+  TTF_Font *font = TTF_OpenFont(font_file, 16);
   if (!font) {
     fputs("Error: Could not load font.", stderr);
     exit(1);
   }
 
+  SDL_Color bg_color;
+  SDL_Color fg_color;
+
+  if (ns_is_lil_endian()) {
+    bg_color = (SDL_Color){
+        .r = (0x000000FF & bg),
+        .g = (0x0000FF00 & bg) >> 8,
+        .b = (0x00FF0000 & bg) >> 16,
+        .a = 0xFF,
+    };
+
+    fg_color = (SDL_Color){
+        .r = (0x000000FF & fg),
+        .g = (0x0000FF00 & fg) >> 8,
+        .b = (0x00FF0000 & fg) >> 16,
+        .a = 0xFF,
+    };
+  } else {
+    bg_color = (SDL_Color){
+        .r = (0xFF000000 & bg),
+        .g = (0x00FF0000 & bg) << 8,
+        .b = (0x0000FF00 & bg) << 16,
+        .a = 0xFF,
+    };
+
+    fg_color = (SDL_Color){
+        .r = (0x000000FF & fg),
+        .g = (0x0000FF00 & fg) >> 8,
+        .b = (0x00FF0000 & fg) >> 16,
+        .a = 0xFF,
+    };
+  }
+    printf("bg_color: %x%x%x\nfg_color: %x%x%x\n", bg_color.r, bg_color.g, bg_color.b, fg_color.r, fg_color.g, fg_color.b);
+
   return (ns_Renderer){
       .window = window,
       .renderer = renderer,
-      .fg = {0xFF, 0xFF, 0xFF, 0xFF},
-      .bg = {0, 0, 0, 0xFF},
+      .fg = fg_color,
+      .bg = bg_color,
       .font = font,
   };
 }
@@ -95,23 +130,6 @@ void ns_renderer_draw_img(const ns_Renderer *renderer, const ns_Item *item) {
   SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
   SDL_DestroyTexture(image_texture);
   SDL_FreeSurface(image_surface);
-}
-
-int ns_get_longest_line(const char *text) {
-  int text_len = 0;
-  int biggest_len = 0;
-  for (int i = 0; text[i] != '\0'; i++) {
-    text_len++;
-    if (text[i] == '\n') {
-      text_len = 0;
-    }
-
-    if (text_len > biggest_len) {
-      biggest_len = text_len;
-    }
-  }
-
-  return biggest_len;
 }
 
 void ns_renderer_draw_paragraph(const ns_Renderer *renderer,

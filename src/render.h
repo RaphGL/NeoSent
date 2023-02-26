@@ -14,7 +14,8 @@ typedef struct {
 } ns_Renderer;
 
 // Sets up and initializes a renderer and its window
-ns_Renderer ns_renderer_create(char *title);
+ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
+                               uint32_t bg);
 
 // Deallocates all resources used by the renderer
 void ns_renderer_destroy(ns_Renderer *restrict renderer);
