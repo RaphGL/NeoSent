@@ -43,7 +43,7 @@
 
 Neosent is a drop-in replacement for Suckless Sent.
 
-It provide everything you need out of the box instead of relying on patches and editing header files.
+It provides everything you need out of the box instead of relying on patches and editing header files.
 
 Supports:
 
@@ -59,7 +59,7 @@ Supports:
 
 ## Getting Started
 
-Make sure you the SDL2, SDL2_ttf and SDL2_image libraries installed.
+Make sure you have the SDL2, SDL2_ttf and SDL2_image libraries installed.
 
 On Arch:
 
@@ -69,7 +69,7 @@ sudo pacman -S sdl2 sdl2_image sdl2_ttf
 
 ### Installation
 
-1. Download the `.zip` file
+1. Clone the project or download the `.zip` file
 2. Extract it
 3. On the extracted folder run:
 
@@ -88,6 +88,8 @@ NeoSent files usually have a `.ns` extension, but any (or no) extension is allow
 ```sh
 $ nsent file.ns
 ```
+
+Some attributes can be changed to fit the user's preference. Check `nsent -h` to learn what can be changed.
 
 The syntax is very minimal, to learn it just see this example:
 
