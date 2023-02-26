@@ -78,25 +78,47 @@ int main(int argc, char *argv[]) {
       // --- Neosent keybindings ---
       if (e.key.type == SDL_KEYDOWN && e.key.repeat == 0) {
         switch (e.key.keysym.sym) {
+          // next page
         case SDLK_RIGHT:
+        case SDLK_DOWN:
+        case SDLK_PAGEDOWN:
         case 'l':
+        case 'j':
+        case 'n':
           if (page + 1 < vec_len(token_vec)) {
             ++page;
           }
           break;
 
+          // previous page
         case SDLK_LEFT:
+        case SDLK_UP:
+        case SDLK_PAGEUP:
         case 'h':
+        case 'k':
+        case 'p':
           if (page != 0) {
             --page;
           }
           break;
 
+          // toggle fullscreen
         case SDLK_F11:
         case 'f':
           ns_renderer_toggle_fullscreen(&renderer);
           break;
 
+          // go to first page
+        case SDLK_HOME:
+          page = 0;
+          break;
+
+          // go to last page
+        case SDLK_END:
+          page = vec_len(token_vec) - 1;
+          break;
+
+          // close program
         case 'q':
           goto cleanup;
           break;
