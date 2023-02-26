@@ -69,6 +69,12 @@ void ns_renderer_destroy(ns_Renderer *restrict renderer) {
 
 void ns_renderer_draw_img(const ns_Renderer *renderer, const ns_Item *item) {
   SDL_Surface *image_surface = IMG_Load(item->content);
+  if (!image_surface) {
+    fprintf(stderr, "Error: Could not read image %s defined at %d:%d\n",
+            item->content, item->linenum, item->colnum);
+    return;
+  }
+
   SDL_Texture *image_texture =
       SDL_CreateTextureFromSurface(renderer->renderer, image_surface);
 
