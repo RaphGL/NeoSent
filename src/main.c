@@ -3,7 +3,6 @@
 #include "utils.h"
 #include "vector.h"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
 #include <getopt.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -69,7 +68,7 @@ int main(int argc, char *argv[]) {
 
   // --- Presenting contents of file ---
   ns_Renderer renderer =
-      ns_renderer_create(stylesheet, font, text_color, bg_color);
+      ns_renderer_create(stylesheet, font, text_color, bg_color, token_vec);
   SDL_Event e;
   size_t page = 0;
   for (;;) {

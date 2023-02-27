@@ -5,13 +5,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_video.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
-                               uint32_t bg) {
+                               uint32_t bg, vec_Vector *token_vec) {
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     fputs(SDL_GetError(), stderr);
     exit(1);
@@ -90,6 +89,7 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
       .bg = bg_color,
       .font = font,
       .is_fullscreen = false,
+      .total_pages = vec_len(token_vec),
   };
 }
 
@@ -106,19 +106,40 @@ void ns_renderer_toggle_fullscreen(ns_Renderer *renderer) {
   if (renderer->is_fullscreen) {
     if (SDL_SetWindowFullscreen(renderer->window, 0) == 0) {
       renderer->is_fullscreen = false;
+      SDL_ShowCursor(SDL_ENABLE);
     }
   } else {
     if (SDL_SetWindowFullscreen(renderer->window,
                                 SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) {
       renderer->is_fullscreen = true;
+      SDL_ShowCursor(SDL_DISABLE);
     }
   }
 }
 
 void ns_renderer_invert_colors(ns_Renderer *renderer) {
-    SDL_Color tmp = renderer->fg;
-    renderer->fg = renderer->bg;
-    renderer->bg = tmp;
+  SDL_Color tmp = renderer->fg;
+  renderer->fg = renderer->bg;
+  renderer->bg = tmp;
+}
+
+static void ns_renderer_draw_progressbar(const ns_Renderer *renderer) {
+  SDL_Point win_size;
+  SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+  int progress_w = win_size.x / renderer->total_pages;
+  if (renderer->curr_page == 0) {
+    progress_w = 0;
+  }
+  SDL_Rect bar = (SDL_Rect){
+      .y = win_size.y - win_size.y * 0.005,
+      .x = 0,
+      .w = progress_w * (renderer->curr_page + 1),
+      .h = win_size.y * 0.005,
+  };
+
+  SDL_SetRenderDrawColor(renderer->renderer, renderer->fg.r, renderer->fg.g,
+                         renderer->fg.b, renderer->fg.a);
+  SDL_RenderFillRect(renderer->renderer, &bar);
 }
 
 static void ns_renderer_draw_img(const ns_Renderer *renderer,
@@ -180,9 +201,10 @@ static void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
   SDL_FreeSurface(text_surface);
 }
 
-void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,
+void ns_renderer_draw(ns_Renderer *renderer, const vec_Vector *token_vec,
                       const size_t page) {
   ns_Item item = vec_get(token_vec, page);
+  renderer->curr_page = page;
   SDL_SetRenderDrawColor(renderer->renderer, renderer->bg.r, renderer->bg.g,
                          renderer->bg.b, renderer->bg.a);
   SDL_RenderClear(renderer->renderer);
@@ -198,5 +220,6 @@ void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,
     break;
   }
 
+  ns_renderer_draw_progressbar(renderer);
   SDL_RenderPresent(renderer->renderer);
 }
