@@ -29,4 +29,7 @@ void ns_renderer_draw(const ns_Renderer *renderer, const vec_Vector *token_vec,
 // Toggle between fullscreen and windowed mode
 void ns_renderer_toggle_fullscreen(ns_Renderer *renderer);
 
+// Inverts background and foreground colors
+void ns_renderer_invert_colors(ns_Renderer *renderer);
+
 #endif

@@ -115,6 +115,12 @@ void ns_renderer_toggle_fullscreen(ns_Renderer *renderer) {
   }
 }
 
+void ns_renderer_invert_colors(ns_Renderer *renderer) {
+    SDL_Color tmp = renderer->fg;
+    renderer->fg = renderer->bg;
+    renderer->bg = tmp;
+}
+
 static void ns_renderer_draw_img(const ns_Renderer *renderer,
                                  const ns_Item *item) {
   SDL_Surface *image_surface = IMG_Load(item->content);
@@ -139,7 +145,7 @@ static void ns_renderer_draw_img(const ns_Renderer *renderer,
   image_rect.x = win_size.x / 2 - image_rect.w / 2;
   image_rect.y = win_size.y / 2 - image_rect.h / 2;
 
-    // make images bigger than resolution scale down
+  // make images bigger than resolution scale down
   if (image_rect.w > win_size.x || image_rect.h > win_size.y) {
     SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
     goto cleanup;

@@ -105,6 +105,10 @@ int main(int argc, char *argv[]) {
           }
           break;
 
+        case 'i':
+          ns_renderer_invert_colors(&renderer);
+          break;
+
           // TODO show keymaps
         case SDLK_F1:
           break;
