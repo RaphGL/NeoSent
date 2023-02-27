@@ -4,6 +4,7 @@
 #include "vector.h"
 #include <SDL2/SDL.h>
 #include <getopt.h>
+#include <linux/limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,7 +26,8 @@ int main(int argc, char *argv[]) {
   // default values
   uint32_t text_color = 0xFFFFFFFF;
   uint32_t bg_color = 0;
-  char *font = "NotoSans-Regular.ttf";
+  char font[PATH_MAX];
+  ns_get_font_path(font, "");
 
   // --- Parsing command line arguments ---
   while ((opt = getopt(argc, argv, ":ht:b:f:")) != -1) {
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'f':
-      font = optarg;
+      ns_get_font_path(font, optarg);
       break;
 
     case ':':

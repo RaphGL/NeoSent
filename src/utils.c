@@ -1,5 +1,7 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -51,4 +53,12 @@ uint32_t ns_get_color(char *hexnum) {
   }
 
   return strtoul(hexnum, NULL, 10);
+}
+
+void ns_get_font_path(char dest[PATH_MAX], const char *fontname) {
+  char cmd[BUFSIZ] = "fc-match --format=%{file} ";
+  strcat(cmd, fontname);
+  FILE *fp = popen(cmd, "r");
+  fgets(dest, PATH_MAX, fp);
+  pclose(fp);
 }
