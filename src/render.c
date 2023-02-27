@@ -135,13 +135,18 @@ static void ns_renderer_draw_img(const ns_Renderer *renderer,
   SDL_QueryTexture(image_texture, NULL, NULL, &image_rect.w, &image_rect.h);
   SDL_Point win_size;
   SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+
+  image_rect.x = win_size.x / 2 - image_rect.w / 2;
+  image_rect.y = win_size.y / 2 - image_rect.h / 2;
+
+    // make images bigger than resolution scale down
   if (image_rect.w > win_size.x || image_rect.h > win_size.y) {
-    // TODO make image maintain ration when scaled down to fit
-    image_rect.w = win_size.x;
-    image_rect.h = win_size.y;
+    SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
+    goto cleanup;
   }
 
   SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
+cleanup:
   SDL_DestroyTexture(image_texture);
   SDL_FreeSurface(image_surface);
 }
