@@ -93,10 +93,13 @@ static void ns_parser_parse_image(ns_Parser *parser, ns_Item *item) {
     i++;
   }
 
-  while ((c = ns_parser_next(parser)) != EOF) {
+  // skips the all subsequent text and places curr in the next section
+  while (c != EOF) {
     if (c == '\n' && ns_parser_peek(parser) == '\n') {
       return;
     }
+
+    c = ns_parser_next(parser);
   }
 }
 
