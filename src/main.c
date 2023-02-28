@@ -23,11 +23,25 @@ void ns_show_help_message(void) {
 int main(int argc, char *argv[]) {
   int opt;
 
-  // default values
+  // --- Default values ---
   uint32_t text_color = 0xFFFFFFFF;
   uint32_t bg_color = 0;
   char font[PATH_MAX];
   ns_get_font_path(font, "");
+
+  // --- Overriding defaults with environment variables ---
+  char *env;
+  if ((env = getenv("NS_FG_COLOR")) != NULL) {
+    text_color = ns_get_color(env);
+  }
+
+  if ((env = getenv("NS_BG_COLOR")) != NULL) {
+    bg_color = ns_get_color(env);
+  }
+
+  if ((env = getenv("NS_PREFERRED_FONT")) != NULL) {
+    ns_get_font_path(font, env);
+  }
 
   // --- Parsing command line arguments ---
   while ((opt = getopt(argc, argv, ":ht:b:f:")) != -1) {

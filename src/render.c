@@ -28,6 +28,8 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
     exit(1);
   }
 
+  char win_title[BUFSIZ] = "NeoSent - ";
+  strncat(win_title, title, BUFSIZ - strlen(win_title));
   SDL_Window *window =
       SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                        1536, 864, SDL_WINDOW_SHOWN);
