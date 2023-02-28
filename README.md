@@ -34,7 +34,13 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li>
+    <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#changing-font-and-colors">Changing font and colors</a></li>
+        <li><a href="#keybindings">Keybindings</a></li>
+      </ul>
+    </li>
     <li><a href="#license">License</a></li>
   </ol>
 </details>
@@ -45,10 +51,18 @@ Neosent is a drop-in replacement for Suckless Sent.
 
 It provides everything you need out of the box instead of relying on patches and editing header files.
 
-Supports:
+<center>
 
-- PNG, JPG, AVIF    ✅
-- TTF and OTF fonts ✅
+| Features                          | Implemented |
+| --------------------------------- | :---------: |
+| PNG, JPG, AVIF                    |      ✅      |
+| Command-line options              |      ✅      |
+| Inverted colors and toggling them |      ✅      |
+| Progress bar                      |      ✅      |
+| Fullscreen mode                   |      ✅      |
+| PDF generation                    |      ❌      |
+
+</center>
 
 ### Built With
 
@@ -69,15 +83,13 @@ sudo pacman -S sdl2 sdl2_image sdl2_ttf
 
 ### Installation
 
-1. Clone the project or download the `.zip` file
-2. Extract it
-3. On the extracted folder run:
+1. Clone the project
+2. Run:
 
 ```sh
 make
 ```
-
-5. Move the `nsent` file to your `$PATH`.
+3. Move the `nsent` file to your `$PATH`.
 
 <!-- USAGE EXAMPLES -->
 
@@ -89,7 +101,7 @@ NeoSent files usually have a `.ns` extension, but any (or no) extension is allow
 $ nsent file.ns
 ```
 
-Some attributes can be changed to fit the user's preference. Check `nsent -h` to learn what can be changed.
+Some attributes can be changed to fit the user's preference.
 
 The syntax is very minimal, to learn it just see this example:
 
@@ -107,10 +119,58 @@ one slide per paragraph
 
 \ # A backslash alone will create an empty slide
 
-\@FILE.png # Image is escape so it will only display the text
+# both of these will be shown instead of interpreted
+\@FILE.png 
+\# Some comment?
 
 Having problems? Make an issue!
 ```
+
+### Changing font and colors
+
+All changeable attributes are available through flags and environment variables. 
+Check `nsent -h` to know what flags are available. 
+The following environment variables are available: 
+- `NS_FG_COLOR` - changes text color
+- `NS_BG_COLOR` - changes the background color
+- `NS_FONT` - changes the preferred font, if not found it will fallback to a system default
+
+Fonts are matched to the system's. Just roughly name the font you want and neosent will fetch it. Fonts have to be installed on the system to work.
+
+```sh
+nsent -f "JetbrainsMono" presentation.ns
+nsent -f "Ubuntu" presentation.ns
+```
+
+Colors are represented as RBG values. Passing them to the program:
+```sh
+nsent -t 0 -b 0xFFFFFF presentation.ns # black text and white background
+nsent -t 0xeb4034 -b 0x2e22a1 presentation.ns # red text and blue background
+```
+
+### Keybindings
+
+<center>
+
+| Previous page | Next page     |
+| ------------- | ------------- |
+| `Left Arrow`  | `Right Arrow` |
+| `Up Arrow`    | `Down Arrow`  |
+| `Page Up`     | `Page Down`   |
+| `h`           | `l`           |
+| `k`           | `j`           |
+| `p`           | `n`           |
+
+Miscellaneous keybindings:
+
+| Function                  | Keybind          |
+| ------------------------- | ---------------- |
+| Go to first and last page | `Home` & `End` |
+| Invert colors             | `i`              |
+| Go fullscreen             | `f` / `F11`     |
+| Quit                      | `q`              |
+
+</center>
 
 <!-- LICENSE -->
 
