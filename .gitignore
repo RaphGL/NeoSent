@@ -1,4 +1,7 @@
 nsent
+NeoSent/
+.SRCINFO
+neosent-git*
 *.png
 *.jpg
 *.pdf
