@@ -83,6 +83,7 @@ sudo pacman -S sdl2 sdl2_image sdl2_ttf
 
 ### Installation
 
+#### Manually
 1. Clone the project
 2. Run:
 
@@ -90,6 +91,11 @@ sudo pacman -S sdl2 sdl2_image sdl2_ttf
 make
 ```
 3. Move the `nsent` file to your `$PATH`.
+
+#### AUR
+```sh
+paru -S neosent-git
+```
 
 <!-- USAGE EXAMPLES -->
 
