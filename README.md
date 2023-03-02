@@ -163,12 +163,12 @@ nsent -t 0xeb4034 -b 0x2e22a1 presentation.ns # red text and blue background
 
 Miscellaneous keybindings:
 
-| Function                  | Keybind          |
-| ------------------------- | ---------------- |
+| Function                  | Keybind        |
+| ------------------------- | -------------- |
 | Go to first and last page | `Home` & `End` |
-| Invert colors             | `i`              |
-| Go fullscreen             | `f` / `F11`     |
-| Quit                      | `q`              |
+| Invert colors             | `i`            |
+| Go fullscreen             | `f` / `F11`    |
+| Quit                      | `q`            |
 
 </center>
 

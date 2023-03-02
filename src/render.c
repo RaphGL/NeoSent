@@ -8,10 +8,32 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+static inline void ns_renderer_check_image_validity(const vec_Vector *token_vec) {
+  bool is_valid = true;
+  for (size_t i = 0; i < vec_len(token_vec); i++) {
+    ns_Item token = vec_get(token_vec, i);
+
+    if (token.type == NS_IMAGE) {
+      if (access(token.content, F_OK) != 0) {
+        fprintf(stderr, "Error: %s declared at %d:%d does not exist.\n",
+                token.content, token.linenum, token.colnum);
+        is_valid = false;
+      }
+    }
+  }
+
+  if (!is_valid) {
+    exit(1);
+  }
+}
 
 ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
                                uint32_t bg, vec_Vector *token_vec,
                                bool show_progressbar) {
+  ns_renderer_check_image_validity(token_vec);
+
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     fputs(SDL_GetError(), stderr);
     exit(1);
