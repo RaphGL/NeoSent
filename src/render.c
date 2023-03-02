@@ -5,12 +5,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_video.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-static inline void ns_renderer_check_image_validity(const vec_Vector *token_vec) {
+static inline void
+ns_renderer_check_image_validity(const vec_Vector *token_vec) {
   bool is_valid = true;
   for (size_t i = 0; i < vec_len(token_vec); i++) {
     ns_Item token = vec_get(token_vec, i);
@@ -55,7 +57,7 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
   strncat(win_title, title, BUFSIZ - strlen(win_title));
   SDL_Window *window =
       SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                       1536, 864, SDL_WINDOW_SHOWN);
+                       1536, 864, SDL_WINDOW_RESIZABLE);
   if (!window) {
     fputs("Error: Could not create window.", stderr);
     exit(1);
@@ -150,8 +152,7 @@ void ns_renderer_invert_colors(ns_Renderer *renderer) {
 }
 
 static void ns_renderer_draw_progressbar(const ns_Renderer *renderer) {
-  SDL_Point win_size;
-  SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+  SDL_Point win_size = renderer->win_size;
   int progress_w = win_size.x / renderer->total_pages;
   if (renderer->curr_page == 0) {
     progress_w = 0;
@@ -186,8 +187,7 @@ static void ns_renderer_draw_img(const ns_Renderer *renderer,
   };
 
   SDL_QueryTexture(image_texture, NULL, NULL, &image_rect.w, &image_rect.h);
-  SDL_Point win_size;
-  SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+  SDL_Point win_size = renderer->win_size;
 
   image_rect.x = win_size.x / 2 - image_rect.w / 2;
   image_rect.y = win_size.y / 2 - image_rect.h / 2;
@@ -207,8 +207,7 @@ cleanup:
 static void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
                                        const ns_Item *item) {
   const int text_len = ns_get_longest_line(item->content);
-  SDL_Point win_size;
-  SDL_GetWindowSize(renderer->window, &win_size.x, &win_size.y);
+  SDL_Point win_size = renderer->win_size;
   TTF_SetFontSize(renderer->font, win_size.x / text_len);
 
   TTF_SetFontHinting(renderer->font, TTF_HINTING_LIGHT_SUBPIXEL);
@@ -231,9 +230,13 @@ void ns_renderer_draw(ns_Renderer *renderer, const vec_Vector *token_vec,
                       const size_t page) {
   ns_Item item = vec_get(token_vec, page);
   renderer->curr_page = page;
+  SDL_GetWindowSize(renderer->window, &renderer->win_size.x,
+                    &renderer->win_size.y);
+
   SDL_SetRenderDrawColor(renderer->renderer, renderer->bg.r, renderer->bg.g,
                          renderer->bg.b, renderer->bg.a);
   SDL_RenderClear(renderer->renderer);
+
   switch (item.type) {
   case NS_IMAGE:
     ns_renderer_draw_img(renderer, &item);

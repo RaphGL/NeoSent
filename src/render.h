@@ -16,6 +16,7 @@ typedef struct {
   size_t total_pages;
   bool is_fullscreen;
   bool show_progressbar;
+  SDL_Point win_size;
 } ns_Renderer;
 
 // Sets up and initializes a renderer and its window
