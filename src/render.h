@@ -12,14 +12,16 @@ typedef struct {
   SDL_Color fg;
   SDL_Color bg;
   TTF_Font *font;
-  bool is_fullscreen;
   size_t curr_page;
   size_t total_pages;
+  bool is_fullscreen;
+  bool show_progressbar;
 } ns_Renderer;
 
 // Sets up and initializes a renderer and its window
 ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
-                               uint32_t bg, vec_Vector *token_vec);
+                               uint32_t bg, vec_Vector *token_vec,
+                               bool show_progressbar);
 
 // Deallocates all resources used by the renderer
 void ns_renderer_destroy(ns_Renderer *restrict renderer);

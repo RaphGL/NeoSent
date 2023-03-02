@@ -10,7 +10,8 @@
 #include <string.h>
 
 ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
-                               uint32_t bg, vec_Vector *token_vec) {
+                               uint32_t bg, vec_Vector *token_vec,
+                               bool show_progressbar) {
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     fputs(SDL_GetError(), stderr);
     exit(1);
@@ -92,6 +93,7 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
       .font = font,
       .is_fullscreen = false,
       .total_pages = vec_len(token_vec),
+      .show_progressbar = show_progressbar,
   };
 }
 
@@ -222,6 +224,9 @@ void ns_renderer_draw(ns_Renderer *renderer, const vec_Vector *token_vec,
     break;
   }
 
-  ns_renderer_draw_progressbar(renderer);
+  if (renderer->show_progressbar) {
+    ns_renderer_draw_progressbar(renderer);
+  }
+
   SDL_RenderPresent(renderer->renderer);
 }

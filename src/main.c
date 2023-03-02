@@ -17,6 +17,7 @@ void ns_show_help_message(void) {
        " -t\tChange the text color\n"
        " -b\tChange the background color\n"
        " -f\tChange the font family\n"
+       " -p\tHide the progress bar\n"
        " -h\tShow this message");
 }
 
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]) {
   // --- Default values ---
   uint32_t text_color = 0xFFFFFFFF;
   uint32_t bg_color = 0;
+  bool show_progressbar = true;
   char font[PATH_MAX];
   ns_get_font_path(font, "");
 
@@ -44,7 +46,7 @@ int main(int argc, char *argv[]) {
   }
 
   // --- Parsing command line arguments ---
-  while ((opt = getopt(argc, argv, ":ht:b:f:")) != -1) {
+  while ((opt = getopt(argc, argv, ":ht:b:f:p")) != -1) {
     switch (opt) {
     case 't':
       text_color = ns_get_color(optarg);
@@ -56,6 +58,10 @@ int main(int argc, char *argv[]) {
 
     case 'f':
       ns_get_font_path(font, optarg);
+      break;
+
+    case 'p':
+      show_progressbar = false;
       break;
 
     case ':':
@@ -84,7 +90,7 @@ int main(int argc, char *argv[]) {
 
   // --- Presenting contents of file ---
   ns_Renderer renderer =
-      ns_renderer_create(stylesheet, font, text_color, bg_color, token_vec);
+      ns_renderer_create(stylesheet, font, text_color, bg_color, token_vec, show_progressbar);
   SDL_Event e;
   size_t page = 0;
   for (;;) {
