@@ -163,6 +163,7 @@ nsent -t 0xeb4034 -b 0x2e22a1 presentation.ns # red text and blue background
 | `Left Arrow`  | `Right Arrow` |
 | `Up Arrow`    | `Down Arrow`  |
 | `Page Up`     | `Page Down`   |
+| `Mouse Right` | `Mouse Right` |
 | `h`           | `l`           |
 | `k`           | `j`           |
 | `p`           | `n`           |

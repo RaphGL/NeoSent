@@ -89,14 +89,30 @@ int main(int argc, char *argv[]) {
   ns_parser_parse(&parser, token_vec);
 
   // --- Presenting contents of file ---
-  ns_Renderer renderer =
-      ns_renderer_create(stylesheet, font, text_color, bg_color, token_vec, show_progressbar);
+  ns_Renderer renderer = ns_renderer_create(
+      stylesheet, font, text_color, bg_color, token_vec, show_progressbar);
   SDL_Event e;
   size_t page = 0;
   for (;;) {
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) {
         goto cleanup;
+      }
+
+      if (e.type == SDL_MOUSEBUTTONDOWN) {
+        switch (e.button.button) {
+        case SDL_BUTTON_LEFT:
+          if (page + 1 < vec_len(token_vec)) {
+            ++page;
+          }
+          break;
+
+        case SDL_BUTTON_RIGHT:
+          if (page != 0) {
+            --page;
+          }
+          break;
+        }
       }
 
       // --- Neosent keybindings ---
