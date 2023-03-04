@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define NS_VERSION "1.0"
+
 void ns_show_help_message(void) {
   puts("Simple plaintext presentation tool"
        "\n\n"
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]) {
   }
 
   // --- Parsing command line arguments ---
-  while ((opt = getopt(argc, argv, ":ht:b:f:p")) != -1) {
+  while ((opt = getopt(argc, argv, ":hVt:b:f:p")) != -1) {
     switch (opt) {
     case 't':
       text_color = ns_get_color(optarg);
@@ -76,6 +78,11 @@ int main(int argc, char *argv[]) {
 
     case 'h':
       ns_show_help_message();
+      return 0;
+      break;
+
+    case 'V':
+      puts("NeoSent v" NS_VERSION);
       return 0;
       break;
     }

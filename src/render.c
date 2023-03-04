@@ -196,15 +196,12 @@ static void ns_renderer_draw_img(const ns_Renderer *renderer,
     image_rect.w = win_size.y * image_ratio;
     image_rect.x = win_size.x / 2 - image_rect.w / 2;
     image_rect.y = win_size.y / 2 - image_rect.h / 2;
-    SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
-    goto cleanup;
   } else {
     image_rect.x = win_size.x / 2 - image_rect.w / 2;
     image_rect.y = win_size.y / 2 - image_rect.h / 2;
   }
 
   SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
-cleanup:
   SDL_DestroyTexture(image_texture);
   SDL_FreeSurface(image_surface);
 }
