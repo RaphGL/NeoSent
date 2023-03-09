@@ -12,10 +12,10 @@ all: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -O2 $^ -o nsent
 
 debug: $(OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DBFLAGS) $^
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DBFLAGS) $^ -o nsent
 
 clean:
-	rm -f *.o a.out nsent
+	rm -f *.o *.out nsent
 
-$(OBJ): $(SRC)
+$(OBJ): %.o: src/%.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -c $?
