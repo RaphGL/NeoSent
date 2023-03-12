@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NS_VERSION "1.0"
+#define NS_VERSION "1.2"
 
 void ns_show_help_message(void) {
   puts("Simple plaintext presentation tool"
@@ -151,10 +151,6 @@ int main(int argc, char *argv[]) {
 
         case 'i':
           ns_renderer_invert_colors(&renderer);
-          break;
-
-          // TODO show keymaps
-        case SDLK_F1:
           break;
 
           // toggle fullscreen
