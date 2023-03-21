@@ -1,4 +1,4 @@
-#include <limits.h>
+#include "utils.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -34,25 +34,32 @@ uint32_t ns_get_color(char *hexnum) {
     return 0;
   }
 
+  int i;
   if (len > 2 && hexnum[0] == '0' && hexnum[1] == 'x') {
-    char hexc[3] = {0};
-    int curr_color = 0;
-    uint32_t end_color = 0;
-    for (int i = 2; i < len; i += 2) {
-      hexc[0] = hexnum[i];
-      hexc[1] = hexnum[i + 1];
-      uint32_t hexn = strtoul(hexc, NULL, 16);
-      if (ns_is_lil_endian()) {
-        end_color |= hexn << (8 * curr_color);
-      } else {
-        end_color |= hexn >> (8 * curr_color);
-      }
-      curr_color++;
-    }
-    return end_color;
+    i = 2;
+  } else if (len > 1 && hexnum[0] == '#') {
+    i = 1;
+  } else {
+    i = 0;
   }
 
-  return strtoul(hexnum, NULL, 10);
+  char hexc[3] = {0};
+  int curr_color = 0;
+  uint32_t end_color = 0;
+
+  for (; i < len; i += 2) {
+    hexc[0] = hexnum[i];
+    hexc[1] = hexnum[i + 1];
+    uint32_t hexn = strtoul(hexc, NULL, 16);
+    if (ns_is_lil_endian()) {
+      end_color |= hexn << (8 * curr_color);
+    } else {
+      end_color |= hexn >> (8 * curr_color);
+    }
+    curr_color++;
+  }
+
+  return end_color;
 }
 
 void ns_get_font_path(char dest[PATH_MAX], const char *fontname) {

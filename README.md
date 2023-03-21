@@ -150,8 +150,8 @@ nsent -f "Ubuntu" presentation.ns
 
 Colors are represented as RBG values. Passing them to the program:
 ```sh
-nsent -t 0 -b 0xFFFFFF presentation.ns # black text and white background
-nsent -t 0xeb4034 -b 0x2e22a1 presentation.ns # red text and blue background
+nsent -t 0 -b "#FFFFFF" presentation.ns # black text and white background
+nsent -t "#eb4034" -b "#0x2e22a1" presentation.ns # red text and blue background
 ```
 
 ### Keybindings
