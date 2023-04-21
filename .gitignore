@@ -6,6 +6,8 @@ neosent-git*
 *.jpg
 *.pdf
 *.ns
+.vscode
+.cache
 
 # Prerequisites
 *.d
