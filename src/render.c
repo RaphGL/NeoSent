@@ -78,35 +78,19 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
   SDL_Color bg_color;
   SDL_Color fg_color;
 
-  if (ns_is_lil_endian()) {
-    bg_color = (SDL_Color){
-        .r = (0x000000FF & bg),
-        .g = (0x0000FF00 & bg) >> 8,
-        .b = (0x00FF0000 & bg) >> 16,
-        .a = 0xFF,
-    };
+  bg_color = (SDL_Color){
+      .r = (0x000000FF & bg),
+      .g = (0x0000FF00 & bg) >> 8,
+      .b = (0x00FF0000 & bg) >> 16,
+      .a = 0xFF,
+  };
 
-    fg_color = (SDL_Color){
-        .r = (0x000000FF & fg),
-        .g = (0x0000FF00 & fg) >> 8,
-        .b = (0x00FF0000 & fg) >> 16,
-        .a = 0xFF,
-    };
-  } else {
-    bg_color = (SDL_Color){
-        .r = (0xFF000000 & bg),
-        .g = (0x00FF0000 & bg) << 8,
-        .b = (0x0000FF00 & bg) << 16,
-        .a = 0xFF,
-    };
-
-    fg_color = (SDL_Color){
-        .r = (0x000000FF & fg),
-        .g = (0x0000FF00 & fg) >> 8,
-        .b = (0x00FF0000 & fg) >> 16,
-        .a = 0xFF,
-    };
-  }
+  fg_color = (SDL_Color){
+      .r = (0x000000FF & fg),
+      .g = (0x0000FF00 & fg) >> 8,
+      .b = (0x00FF0000 & fg) >> 16,
+      .a = 0xFF,
+  };
 
   return (ns_Renderer){
       .window = window,

@@ -22,12 +22,6 @@ int ns_get_longest_line(const char *text) {
   return biggest_len;
 }
 
-bool ns_is_lil_endian(void) {
-  volatile uint32_t i = 0x01234567;
-  // return false for big endian, true for little endian.
-  return (*((uint8_t *)(&i))) == 0x67;
-}
-
 uint32_t ns_get_color(char *hexnum) {
   int len = strlen(hexnum);
   if (len == 0) {
@@ -51,11 +45,7 @@ uint32_t ns_get_color(char *hexnum) {
     hexc[0] = hexnum[i];
     hexc[1] = hexnum[i + 1];
     uint32_t hexn = strtoul(hexc, NULL, 16);
-    if (ns_is_lil_endian()) {
-      end_color |= hexn << (8 * curr_color);
-    } else {
-      end_color |= hexn >> (8 * curr_color);
-    }
+    end_color |= hexn << (8 * curr_color);
     curr_color++;
   }
 
