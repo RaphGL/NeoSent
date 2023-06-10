@@ -40,8 +40,12 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
     exit(1);
   }
 
-  const int img_flags =
-      IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_WEBP | IMG_INIT_AVIF;
+  int img_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_WEBP;
+
+#ifdef AVIF_SUPPORT
+  img_flags |= IMG_INIT_AVIF;
+#endif
+
   if (IMG_Init(img_flags) != img_flags) {
     fputs("Error: Failed to initialize image subsystems.", stderr);
     exit(1);
@@ -195,7 +199,6 @@ static void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
   SDL_Point win_size = renderer->win_size;
   TTF_SetFontSize(renderer->font, win_size.x / text_len);
 
-  TTF_SetFontHinting(renderer->font, TTF_HINTING_LIGHT_SUBPIXEL);
   SDL_Surface *text_surface = TTF_RenderUTF8_Blended_Wrapped(
       renderer->font, item->content, renderer->fg, 0);
   SDL_Texture *text_texture =

@@ -90,6 +90,11 @@ sudo pacman -S sdl2 sdl2_image sdl2_ttf
 ```sh
 make
 ```
+
+AVIF images are also supported but they're hidden behind a flag for portability reasons. To enable it:
+```sh
+make CFLAGS=-DAVIF_SUPPORT
+```
 3. Move the `nsent` file to your `$PATH`.
 
 #### AUR
