@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define NS_VERSION "1.2"
 
@@ -18,6 +19,7 @@ void ns_show_help_message(void) {
        " -t\tChange the text color\n"
        " -b\tChange the background color\n"
        " -f\tChange the font family\n"
+       " -s\tChange font size\n"
        " -p\tHide the progress bar\n"
        " -h\tShow this message");
 }
@@ -30,6 +32,7 @@ int main(int argc, char *argv[]) {
   uint32_t bg_color = 0;
   bool show_progressbar = true;
   char font[PATH_MAX];
+  size_t fontsiz = 52;
   ns_get_font_path(font, "");
 
   // --- Overriding defaults with environment variables ---
@@ -46,6 +49,10 @@ int main(int argc, char *argv[]) {
     ns_get_font_path(font, env);
   }
 
+  if ((env = getenv("NS_FONT_SIZE")) != NULL) {
+    fontsiz = SDL_strtol(env, NULL, 10);
+  }
+
   // --- Parsing command line arguments ---
   while ((opt = getopt(argc, argv, ":hVt:b:f:p")) != -1) {
     switch (opt) {
@@ -59,6 +66,10 @@ int main(int argc, char *argv[]) {
 
     case 'f':
       ns_get_font_path(font, optarg);
+      break;
+
+    case 's':
+      fontsiz = SDL_strtol(env, NULL, 10);
       break;
 
     case 'p':
@@ -96,7 +107,7 @@ int main(int argc, char *argv[]) {
 
   // --- Presenting contents of file ---
   ns_Renderer renderer = ns_renderer_create(
-      stylesheet, font, text_color, bg_color, token_vec, show_progressbar);
+      stylesheet, font, fontsiz, text_color, bg_color, token_vec, show_progressbar);
   SDL_Event e;
   size_t page = 0;
   for (;;) {

@@ -1,6 +1,6 @@
 project(
     'neosent', 'c', 
-    default_options: ['c_std=c11'], 
+    default_options: ['c_std=c11', 'b_buildtype=release', 'b_ndebug=true'], 
     version: '1.2'
 )
 

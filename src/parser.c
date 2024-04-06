@@ -58,8 +58,7 @@ static char ns_parser_next(ns_Parser *parser) {
 }
 
 static void ns_parser_parse_comment(ns_Parser *parser) {
-  // skips comments if they don't start at column 1
-  if (parser->colnum != 1) {
+  if (parser->curr != '#') {
     return;
   }
 
@@ -122,12 +121,20 @@ static void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
   paragraph.content[0] = parser->curr;
   while ((c = ns_parser_next(parser)) != EOF) {
     // skip escaped chars
-    switch (ns_parser_peek(parser)) {
-    case '#':
-    case '\\':
-    case '@':
-      ns_parser_next(parser);
-      break;
+    if (c == '\\') {
+      switch (ns_parser_peek(parser)) {
+      case '#':
+      case '\\':
+      case '@':
+        c = ns_parser_next(parser);
+        break;
+      }
+    }
+
+    if (c == '#') {
+      ns_parser_parse_comment(parser);
+      c = '\n';
+      --i; // fixes double newline insertion
     }
 
     if (c == '\n' &&
@@ -137,6 +144,7 @@ static void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
       return;
     }
 
+    // grow string if necessary
     if (i == para_size) {
       para_size += 80;
       char *tmp = realloc(paragraph.content, para_size);
@@ -152,9 +160,14 @@ static void ns_parser_parse_paragraph(ns_Parser *parser, ns_Item *item) {
   }
 }
 
-static void ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item) {
-  if (parser->colnum != 1) {
-    return;
+static bool ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item) {
+  if (parser->colnum != 1 && parser->curr != '\\') {
+    return false;
+  }
+
+  int next = ns_parser_next(parser);
+  if (!isspace(next)) {
+    return false;
   }
 
   ns_Item empty_slide = (ns_Item){
@@ -163,57 +176,49 @@ static void ns_parser_parse_emptyslide(ns_Parser *parser, ns_Item *item) {
       .colnum = parser->colnum,
       .content = malloc(sizeof(char) * 2),
   };
-
-  int c;
-  while ((c = ns_parser_next(parser)) != EOF) {
-    if (c == '\n') {
-      empty_slide.content[0] = '\\';
-      empty_slide.content[1] = '\0';
-      *item = empty_slide;
-      break;
-    }
-  }
-
-  while (c != EOF) {
-    if (c == '\n' && ns_parser_peek(parser) == '\n') {
-      return;
-    }
-
-    ns_parser_next(parser);
-  }
+  empty_slide.content[0] = '\\';
+  empty_slide.content[1] = '\0';
+  *item = empty_slide;
+  return true;
 }
 
+#ifndef NDEBUG
+void ns_parser_print(vec_Vector *token_vec) {
+  for (size_t i = 0; i < vec_len(token_vec); i++) {
+    ns_Item item = vec_get(token_vec, i);
+    switch (item.type) {
+    case NS_IMAGE:
+      printf("Image(\n%s\n)", item.content);
+      break;
+    case NS_EMPTYSLIDE:
+      printf("EmptySlide");
+      break;
+    case NS_PARAGRAPH:
+      printf("Paragraph(\n%s\n)", item.content);
+      break;
+    }
+    printf("\n\n");
+  }
+}
+#endif
+
 void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec) {
-  ns_Item item = (ns_Item){
-      .content = NULL,
-  };
-
   while ((parser->curr = ns_parser_next(parser)) != EOF) {
-    switch (parser->curr) {
-    case '#':
-      ns_parser_parse_comment(parser);
+    ns_Item item;
+    if (parser->colnum != 1)
       continue;
-      break;
-
-    case '\\':
-      switch (ns_parser_peek(parser)) {
-      case '#':
-      case '\\':
-      case '@':
-        ns_parser_next(parser);
-        ns_parser_parse_paragraph(parser, &item);
-        break;
-
-      default:
-        ns_parser_parse_emptyslide(parser, &item);
-        break;
-      }
-      break;
-
+    switch (parser->curr) {
     case '@':
       ns_parser_parse_image(parser, &item);
       break;
-
+    case '#':
+      ns_parser_parse_comment(parser);
+      break;
+    case '\\':
+      if (ns_parser_parse_emptyslide(parser, &item)) {
+        ns_parser_parse_paragraph(parser, &item);
+      }
+      break;
     default:
       ns_parser_parse_paragraph(parser, &item);
       break;
@@ -224,4 +229,8 @@ void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec) {
       item.content = NULL;
     }
   }
+
+#ifndef NDEBUG
+  ns_parser_print(token_vec);
+#endif
 }

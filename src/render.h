@@ -12,6 +12,7 @@ typedef struct {
   SDL_Color fg;
   SDL_Color bg;
   TTF_Font *font;
+  size_t font_size;
   size_t curr_page;
   size_t total_pages;
   bool is_fullscreen;
@@ -20,8 +21,8 @@ typedef struct {
 } ns_Renderer;
 
 // Sets up and initializes a renderer and its window
-ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
-                               uint32_t bg, vec_Vector *token_vec,
+ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
+                               uint32_t fg, uint32_t bg, vec_Vector *token_vec,
                                bool show_progressbar);
 
 // Deallocates all resources used by the renderer

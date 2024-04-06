@@ -30,8 +30,8 @@ ns_renderer_check_image_validity(const vec_Vector *token_vec) {
   }
 }
 
-ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
-                               uint32_t bg, vec_Vector *token_vec,
+ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
+                               uint32_t fg, uint32_t bg, vec_Vector *token_vec,
                                bool show_progressbar) {
   ns_renderer_check_image_validity(token_vec);
 
@@ -102,6 +102,7 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, uint32_t fg,
       .fg = fg_color,
       .bg = bg_color,
       .font = font,
+      .font_size = font_size,
       .is_fullscreen = false,
       .total_pages = vec_len(token_vec),
       .show_progressbar = show_progressbar,
@@ -197,7 +198,9 @@ static void ns_renderer_draw_paragraph(const ns_Renderer *renderer,
                                        const ns_Item *item) {
   const int text_len = ns_get_longest_line(item->content);
   SDL_Point win_size = renderer->win_size;
-  TTF_SetFontSize(renderer->font, win_size.x / text_len);
+  size_t pointsiz = win_size.x / text_len;
+  TTF_SetFontSize(renderer->font,
+                  win_size.x / (text_len * pointsiz) * renderer->font_size);
 
   SDL_Surface *text_surface = TTF_RenderUTF8_Blended_Wrapped(
       renderer->font, item->content, renderer->fg, 0);
