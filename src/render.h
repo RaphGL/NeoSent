@@ -1,6 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 #include "vector.h"
+#include "hashmap.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
@@ -12,6 +13,7 @@ typedef struct {
   SDL_Color fg;
   SDL_Color bg;
   TTF_Font *font;
+  struct hashmap *img_texture_cache;
   size_t font_size;
   size_t curr_page;
   size_t total_pages;

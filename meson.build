@@ -15,7 +15,8 @@ deps = [
 
 executable('nsent', 
     ['src/main.c', 'src/parser.c',
-    'src/render.c', 'src/utils.c', 'src/vector.c'],
+    'src/render.c', 'src/utils.c',
+    'src/vector.c', 'src/hashmap.c'],
     dependencies: deps
 )
 

@@ -1,4 +1,5 @@
 #include "render.h"
+#include "SDL_render.h"
 #include "parser.h"
 #include "utils.h"
 #include "vector.h"
@@ -10,13 +11,17 @@
 #include <string.h>
 #include <unistd.h>
 
-static inline void
+// returns how many images are in presentation
+// exits and prints what image paths are invalid otherwise
+static inline size_t
 ns_renderer_check_image_validity(const vec_Vector *token_vec) {
   bool is_valid = true;
+  size_t img_count = 0;
   for (size_t i = 0; i < vec_len(token_vec); i++) {
     ns_Item token = vec_get(token_vec, i);
 
     if (token.type == NS_IMAGE) {
+      ++img_count;
       if (access(token.content, F_OK) != 0) {
         fprintf(stderr, "Error: %s declared at %d:%d does not exist.\n",
                 token.content, token.linenum, token.colnum);
@@ -28,13 +33,31 @@ ns_renderer_check_image_validity(const vec_Vector *token_vec) {
   if (!is_valid) {
     exit(1);
   }
+
+  return img_count;
+}
+
+// key-value stored in image cache hashmap
+typedef struct {
+  char *path;
+  SDL_Texture *texture;
+} ImageKV;
+
+int __img_compare(const void *a, const void *b, void *data) {
+  (void)data;
+  const ImageKV *ia = a, *ib = b;
+  return strcmp(ia->path, ib->path);
+}
+
+uint64_t __img_hash(const void *item, uint64_t seed0, uint64_t seed1) {
+  const ImageKV *img = item;
+  return hashmap_sip(img->path, strlen(img->path), seed0, seed1);
 }
 
 ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
                                uint32_t fg, uint32_t bg, vec_Vector *token_vec,
                                bool show_progressbar) {
-  ns_renderer_check_image_validity(token_vec);
-
+  // --- Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     fputs(SDL_GetError(), stderr);
     exit(1);
@@ -96,11 +119,42 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
       .a = 0xFF,
   };
 
+  // --- Initialize image texture cache
+  size_t image_count = ns_renderer_check_image_validity(token_vec);
+  struct hashmap *img_texture_cache =
+      hashmap_new(sizeof(ImageKV), image_count, 0, 0, __img_hash,
+                  __img_compare, NULL, NULL);
+
+  for (size_t i = 0; i < vec_len(token_vec); i++) {
+    ns_Item token = vec_get(token_vec, i);
+
+    if (token.type == NS_IMAGE) {
+      SDL_Surface *image_surface = IMG_Load(token.content);
+      if (!image_surface) {
+        fprintf(stderr, "Error: Could not read image %s defined at %d:%d\n",
+                token.content, token.linenum, token.colnum);
+        continue;
+      }
+
+      SDL_Texture *image_texture =
+          SDL_CreateTextureFromSurface(renderer, image_surface);
+
+      hashmap_set(img_texture_cache, &(ImageKV){
+                                         .texture = image_texture,
+                                         .path = token.content,
+                                     });
+
+
+      SDL_FreeSurface(image_surface);
+    }
+  }
+
   return (ns_Renderer){
       .window = window,
       .renderer = renderer,
       .fg = fg_color,
       .bg = bg_color,
+      .img_texture_cache = img_texture_cache,
       .font = font,
       .font_size = font_size,
       .is_fullscreen = false,
@@ -110,6 +164,14 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
 }
 
 void ns_renderer_destroy(ns_Renderer *restrict renderer) {
+  size_t i = 0;
+  void *item;
+  while (hashmap_iter(renderer->img_texture_cache, &i, &item)) {
+    const ImageKV *img = item;
+    SDL_DestroyTexture(img->texture);
+  }
+  hashmap_free(renderer->img_texture_cache);
+
   SDL_DestroyRenderer(renderer->renderer);
   SDL_DestroyWindow(renderer->window);
   IMG_Quit();
@@ -159,22 +221,15 @@ static void ns_renderer_draw_progressbar(const ns_Renderer *renderer) {
 
 static void ns_renderer_draw_img(const ns_Renderer *renderer,
                                  const ns_Item *item) {
-  SDL_Surface *image_surface = IMG_Load(item->content);
-  if (!image_surface) {
-    fprintf(stderr, "Error: Could not read image %s defined at %d:%d\n",
-            item->content, item->linenum, item->colnum);
-    return;
-  }
-
-  SDL_Texture *image_texture =
-      SDL_CreateTextureFromSurface(renderer->renderer, image_surface);
-
   SDL_Rect image_rect = (SDL_Rect){
       .x = 0,
       .y = 0,
   };
 
-  SDL_QueryTexture(image_texture, NULL, NULL, &image_rect.w, &image_rect.h);
+  ImageKV *image = (ImageKV *)hashmap_get(renderer->img_texture_cache,
+                                          &(ImageKV){.path = item->content});
+
+  SDL_QueryTexture(image->texture, NULL, NULL, &image_rect.w, &image_rect.h);
   SDL_Point win_size = renderer->win_size;
 
   // make images bigger than resolution scale down
@@ -189,9 +244,7 @@ static void ns_renderer_draw_img(const ns_Renderer *renderer,
     image_rect.y = win_size.y / 2 - image_rect.h / 2;
   }
 
-  SDL_RenderCopy(renderer->renderer, image_texture, NULL, &image_rect);
-  SDL_DestroyTexture(image_texture);
-  SDL_FreeSurface(image_surface);
+  SDL_RenderCopy(renderer->renderer, image->texture, NULL, &image_rect);
 }
 
 static void ns_renderer_draw_paragraph(const ns_Renderer *renderer,

@@ -204,7 +204,7 @@ void ns_parser_print(vec_Vector *token_vec) {
 
 void ns_parser_parse(ns_Parser *parser, vec_Vector *token_vec) {
   while ((parser->curr = ns_parser_next(parser)) != EOF) {
-    ns_Item item;
+    ns_Item item = {0};
     if (parser->colnum != 1)
       continue;
     switch (parser->curr) {

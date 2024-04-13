@@ -1,3 +1,4 @@
+// adapted from https://github.com/RaphGL/CLibs/
 #include "vector.h"
 #include "parser.h"
 #include <math.h>

@@ -7,9 +7,21 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <string.h>
 
 #define NS_VERSION "1.2"
+
+static ns_Renderer renderer;
+static ns_Parser parser;
+static vec_Vector *token_vec;
+
+void ns_cleanup(int signum) {
+  (void)signum;
+  ns_renderer_destroy(&renderer);
+  ns_parser_free(&parser, token_vec);
+  exit(0);
+}
 
 void ns_show_help_message(void) {
   puts("Simple plaintext presentation tool"
@@ -101,13 +113,18 @@ int main(int argc, char *argv[]) {
   char *stylesheet = argv[optind];
 
   // --- Parsing presentation file ---
-  ns_Parser parser = ns_parser_new(stylesheet);
-  vec_Vector *token_vec = vec_new();
+  parser = ns_parser_new(stylesheet);
+  token_vec = vec_new();
   ns_parser_parse(&parser, token_vec);
 
+  signal(SIGINT, ns_cleanup);
+  signal(SIGABRT, ns_cleanup);
+  signal(SIGTERM, ns_cleanup);
+  signal(SIGTSTP, ns_cleanup);
+
   // --- Presenting contents of file ---
-  ns_Renderer renderer = ns_renderer_create(
-      stylesheet, font, fontsiz, text_color, bg_color, token_vec, show_progressbar);
+  renderer = ns_renderer_create(stylesheet, font, fontsiz, text_color, bg_color,
+                                token_vec, show_progressbar);
   SDL_Event e;
   size_t page = 0;
   for (;;) {
@@ -192,7 +209,6 @@ int main(int argc, char *argv[]) {
 
   // --- Final cleanup ---
 cleanup:
-  ns_renderer_destroy(&renderer);
-  ns_parser_free(&parser, token_vec);
+  ns_cleanup(0);
   return 0;
 }
