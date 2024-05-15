@@ -25,6 +25,9 @@ ns_renderer_check_image_validity(const vec_Vector *token_vec) {
       if (access(token.content, F_OK) != 0) {
         fprintf(stderr, "Error: %s declared at %d:%d does not exist.\n",
                 token.content, token.linenum, token.colnum);
+        // todo: remove once relative paths are supported
+        perror("Neosent only supports absolute paths for now. Make sure your "
+               "path is valid and absolute.");
         is_valid = false;
       }
     }
@@ -122,8 +125,8 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
   // --- Initialize image texture cache
   size_t image_count = ns_renderer_check_image_validity(token_vec);
   struct hashmap *img_texture_cache =
-      hashmap_new(sizeof(ImageKV), image_count, 0, 0, __img_hash,
-                  __img_compare, NULL, NULL);
+      hashmap_new(sizeof(ImageKV), image_count, 0, 0, __img_hash, __img_compare,
+                  NULL, NULL);
 
   for (size_t i = 0; i < vec_len(token_vec); i++) {
     ns_Item token = vec_get(token_vec, i);
@@ -143,7 +146,6 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
                                          .texture = image_texture,
                                          .path = token.content,
                                      });
-
 
       SDL_FreeSurface(image_surface);
     }
@@ -274,8 +276,8 @@ void ns_renderer_draw(ns_Renderer *renderer, const vec_Vector *token_vec,
                       const size_t page) {
   ns_Item item = vec_get(token_vec, page);
   renderer->curr_page = page;
-  SDL_GetWindowSize(renderer->window, &renderer->win_size.x,
-                    &renderer->win_size.y);
+  SDL_GetRendererOutputSize(renderer->renderer, &renderer->win_size.x,
+                            &renderer->win_size.y);
 
   SDL_SetRenderDrawColor(renderer->renderer, renderer->bg.r, renderer->bg.g,
                          renderer->bg.b, renderer->bg.a);
