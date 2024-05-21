@@ -6,22 +6,45 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <cwalk.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
+// resolves path by making them absolute, 
+// reading env vars and resolving `~` if needed
+void resolve_path(char *dest) {
+  char cwd[PATH_MAX] = {0};
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+    perror("Error: failed to retrieve current directory.");
+    exit(1);
+  }
+
+  char *abs_path = malloc(PATH_MAX);
+  if (!abs_path) {
+    perror("Error: Memory allocation failed");
+    exit(1);
+  }
+
+  cwk_path_get_absolute(cwd, dest, abs_path, PATH_MAX);
+  strncpy(dest, abs_path, PATH_MAX);
+  free(abs_path);
+}
+
 // returns how many images are in presentation
 // exits and prints what image paths are invalid otherwise
-static inline size_t
-ns_renderer_check_image_validity(const vec_Vector *token_vec) {
+static inline size_t ns_renderer_validate_images(const vec_Vector *token_vec) {
   bool is_valid = true;
   size_t img_count = 0;
+
   for (size_t i = 0; i < vec_len(token_vec); i++) {
     ns_Item token = vec_get(token_vec, i);
 
     if (token.type == NS_IMAGE) {
       ++img_count;
+      resolve_path(token.content);
+
       if (access(token.content, F_OK) != 0) {
         fprintf(stderr, "Error: %s declared at %d:%d does not exist.\n",
                 token.content, token.linenum, token.colnum);
@@ -123,7 +146,7 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
   };
 
   // --- Initialize image texture cache
-  size_t image_count = ns_renderer_check_image_validity(token_vec);
+  size_t image_count = ns_renderer_validate_images(token_vec);
   struct hashmap *img_texture_cache =
       hashmap_new(sizeof(ImageKV), image_count, 0, 0, __img_hash, __img_compare,
                   NULL, NULL);

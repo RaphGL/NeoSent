@@ -1,0 +1,4 @@
+[submodule "vendor/cwalk"]
+	path = vendor/cwalk
+	url = https://github.com/likle/cwalk
+	branch = stable
