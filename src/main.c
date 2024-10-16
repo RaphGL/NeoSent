@@ -4,13 +4,11 @@
 #include "vector.h"
 #include <SDL2/SDL.h>
 #include <getopt.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <string.h>
-
-#define NS_VERSION "1.2"
 
 static ns_Renderer renderer;
 static ns_Parser parser;
@@ -33,7 +31,8 @@ void ns_show_help_message(void) {
        " -f\tChange the font family\n"
        " -s\tChange font size\n"
        " -p\tHide the progress bar\n"
-       " -h\tShow this message");
+       " -h\tShow this message\n"
+       "-V\tPrints version information");
 }
 
 int main(int argc, char *argv[]) {
@@ -91,22 +90,18 @@ int main(int argc, char *argv[]) {
     case ':':
       fputs("Error: Argument was not provided to option.\n", stderr);
       return 1;
-      break;
 
     case '?':
       fputs("Error: No such option.\n", stderr);
       return 1;
-      break;
 
     case 'h':
       ns_show_help_message();
       return 0;
-      break;
 
     case 'V':
-      puts("NeoSent v" NS_VERSION);
+      puts("Neosent v" NS_VERSION);
       return 0;
-      break;
     }
   }
 

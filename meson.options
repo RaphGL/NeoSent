@@ -1,0 +1,6 @@
+option(
+  'avif_image_support',
+  type: 'boolean',
+  value: false,
+  description: 'Enables AVIF image support'
+)

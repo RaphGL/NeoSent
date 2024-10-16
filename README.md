@@ -88,13 +88,21 @@ sudo pacman -S sdl2 sdl2_image sdl2_ttf
 2. Run:
 
 ```sh
-make
+$ meson setup build
+$ cd build
 ```
 
-AVIF images are also supported but they're hidden behind a flag for portability reasons. To enable it:
+AVIF images are also supported but they're hidden behind a flag for portability reasons. To enable run:
 ```sh
-make CFLAGS=-DAVIF_SUPPORT
+$ meson configure -Davif_image_support=true
+$ 
 ```
+
+```sh
+$ meson configure --buildtype=release
+$ meson compile
+```
+
 3. Move the `nsent` file to your `$PATH`.
 
 #### AUR

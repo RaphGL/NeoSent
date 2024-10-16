@@ -1,5 +1,4 @@
 #include "render.h"
-#include "SDL_render.h"
 #include "parser.h"
 #include "utils.h"
 #include "vector.h"
@@ -91,7 +90,7 @@ ns_Renderer ns_renderer_create(char *title, char *font_file, size_t font_size,
 
   int img_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_WEBP;
 
-#ifdef AVIF_SUPPORT
+#ifdef NS_AVIF_SUPPORT
   img_flags |= IMG_INIT_AVIF;
 #endif
 
@@ -229,9 +228,6 @@ void ns_renderer_invert_colors(ns_Renderer *renderer) {
 static void ns_renderer_draw_progressbar(const ns_Renderer *renderer) {
   SDL_Point win_size = renderer->win_size;
   int progress_w = win_size.x / renderer->total_pages;
-  if (renderer->curr_page == 0) {
-    progress_w = 0;
-  }
   SDL_Rect bar = (SDL_Rect){
       .y = win_size.y - win_size.y * 0.005,
       .x = 0,
